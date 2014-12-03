@@ -26,7 +26,31 @@ namespace FirstREST.Lib_Primavera.Model
             set;
         }
 
-        public string Moeda
+        public string Rua
+        {
+            get;
+            set;
+        }
+
+        public string Cidade
+        {
+            get;
+            set;
+        }
+
+        public string CodPostal1
+        {
+            get;
+            set;
+        }
+
+        public string CodPostal2
+        {
+            get;
+            set;
+        }
+
+        public string Email
         {
             get;
             set;

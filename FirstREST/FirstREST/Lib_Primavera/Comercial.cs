@@ -67,7 +67,7 @@ namespace FirstREST.Lib_Primavera
 
             Model.Cliente myCli = new Model.Cliente();
 
-            if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+            if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
             {
 
                 if (PriEngine.Engine.Comercial.Clientes.Existe(codCliente) == true)

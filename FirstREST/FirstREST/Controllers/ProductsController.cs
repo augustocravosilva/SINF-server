@@ -11,8 +11,14 @@ using FirstREST.Lib_Primavera.Model;
 
 namespace FirstREST.Controllers
 {
-    public class ArtigosController : ApiController
+    public class ProductsController : ApiController
     {
+
+        public class ProductAnswer
+        {
+           public Artigo product { get; set; }
+        }
+
         //
         // GET: /Artigos/
 
@@ -23,17 +29,18 @@ namespace FirstREST.Controllers
 
 
         // GET api/artigo/5    
-        public Artigo Get(string id)
+        public ProductAnswer Get(string id)
         {
             Lib_Primavera.Model.Artigo artigo = Lib_Primavera.Comercial.GetArtigo(id);
             if (artigo == null)
             {
-                throw new HttpResponseException(
-                  Request.CreateResponse(HttpStatusCode.NotFound));
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
             else
             {
-                return artigo;
+                ProductAnswer pa = new ProductAnswer();
+                pa.product = artigo;
+                return pa;
             }
         }
 

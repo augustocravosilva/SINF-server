@@ -309,7 +309,7 @@ namespace FirstREST.Lib_Primavera
                     while (!pics.NoFim())
                     {
                         string tipo = pics.Valor("Tipo");
-                        string path = pics.Valor("Id")+".JPG";
+                        string path = pics.Valor("Id");
                         if (tipo.Equals("IPR"))
                             images_path.Insert(0, path);
                         else images_path.Add(path);

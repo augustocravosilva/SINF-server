@@ -5,7 +5,9 @@ using System.Web;
 using Interop.ErpBS800;
 using Interop.StdPlatBS800;
 using Interop.StdBE800;
+using Interop.StdPlatBE800;
 using Interop.GcpBE800;
+using Interop.IBasBS800;
 using ADODB;
 using Interop.IGcpBS800;
 //using Interop.StdBESql800;
@@ -44,7 +46,6 @@ namespace FirstREST.Lib_Primavera
                     cli = new Model.Cliente();
                     cli.CodCliente = objList.Valor("Cliente");
                     cli.NomeCliente = objList.Valor("Nome");
-                    cli.Moeda = objList.Valor("Moeda");
                     cli.NumContribuinte = objList.Valor("NumContribuinte");
 
                     listClientes.Add(cli);
@@ -75,7 +76,6 @@ namespace FirstREST.Lib_Primavera
                     objCli = PriEngine.Engine.Comercial.Clientes.Edita(codCliente);
                     myCli.CodCliente = objCli.get_Cliente();
                     myCli.NomeCliente = objCli.get_Nome();
-                    myCli.Moeda = objCli.get_Moeda();
                     myCli.NumContribuinte = objCli.get_NumContribuinte();
                     return myCli;
                 }
@@ -118,7 +118,6 @@ namespace FirstREST.Lib_Primavera
 
                         objCli.set_Nome(cliente.NomeCliente);
                         objCli.set_NumContribuinte(cliente.NumContribuinte);
-                        objCli.set_Moeda(cliente.Moeda);
 
                         PriEngine.Engine.Comercial.Clientes.Actualiza(objCli);
 
@@ -208,7 +207,6 @@ namespace FirstREST.Lib_Primavera
                     myCli.set_Cliente(cli.CodCliente);
                     myCli.set_Nome(cli.NomeCliente);
                     myCli.set_NumContribuinte(cli.NumContribuinte);
-                    myCli.set_Moeda(cli.Moeda);
 
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
 
@@ -259,15 +257,15 @@ namespace FirstREST.Lib_Primavera
 
         #endregion Cliente;   // -----------------------------  END   CLIENTE    -----------------------
 
+        #region Artigo
 
         public static Lib_Primavera.Model.Artigo GetArtigo(string codArtigo)
         {
-            
 
             GcpBEArtigo objArtigo = new GcpBEArtigo();
             Model.Artigo myArt = new Model.Artigo();
 
-            if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+            if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
             {
 
                 if (PriEngine.Engine.Comercial.Artigos.Existe(codArtigo) == false)
@@ -276,11 +274,51 @@ namespace FirstREST.Lib_Primavera
                 }
                 else
                 {
+                    
                     objArtigo = PriEngine.Engine.Comercial.Artigos.Edita(codArtigo);
-                    myArt.CodArtigo = objArtigo.get_Artigo();
-                    myArt.DescArtigo = objArtigo.get_Descricao();
+                    myArt.id = objArtigo.get_Artigo();
+                    myArt.name = objArtigo.get_Descricao();
+                    myArt.category = objArtigo.get_SubFamilia();
+                    myArt.brand = objArtigo.get_Marca();
+                    myArt.price = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(codArtigo)[1].get_PVP1();
+                    foreach(StdBECampo campo in objArtigo.get_CamposUtil())
+                    {
+                        if (campo.Nome.Equals("CDU_MATERIAL"))
+                            myArt.material = campo.Valor;
+                        else myArt.description = campo.Valor;
+                    }
+                    List<Model.SubProduct> subproducts = new List<Model.SubProduct>();
 
-                    return myArt;
+                    int sublength = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo).NumItens;
+                    for (int i = 1; i <= sublength; i++)
+                    {
+                        Model.SubProduct sub = new Model.SubProduct();
+                        sub.color = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao1();
+                        sub.size = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao2();
+                        string subname = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
+                        sub.stock = (int)PriEngine.Engine.Comercial.Artigos.Edita(subname).get_StkActual();
+                        subproducts.Add(sub);
+                    }
+
+                    myArt.subproducts = subproducts.ToArray();
+
+                    StdBELista pics = PriEngine.Engine.Consulta("Select * from Anexos where Tabela=4 and Chave='" + codArtigo + "'");
+
+                    List<string> images_path = new List<string>();
+
+                    while (!pics.NoFim())
+                    {
+                        string tipo = pics.Valor("Tipo");
+                        string path = pics.Valor("Id")+".JPG";
+                        if (tipo.Equals("IPR"))
+                            images_path.Insert(0, path);
+                        else images_path.Add(path);
+                        pics.Seguinte();
+                    }
+
+                    myArt.image_links = images_path.ToArray();
+                    
+                        return myArt;
                 }
                 
             }
@@ -300,7 +338,7 @@ namespace FirstREST.Lib_Primavera
             Model.Artigo art = new Model.Artigo();
             List<Model.Artigo> listArts = new List<Model.Artigo>();
 
-            if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+            if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
             {
 
                 objList = PriEngine.Engine.Comercial.Artigos.LstArtigos();
@@ -308,8 +346,6 @@ namespace FirstREST.Lib_Primavera
                 while (!objList.NoFim())
                 {
                     art = new Model.Artigo();
-                    art.CodArtigo = objList.Valor("artigo");
-                    art.DescArtigo = objList.Valor("descricao");
 
                     listArts.Add(art);
                     objList.Seguinte();
@@ -325,7 +361,7 @@ namespace FirstREST.Lib_Primavera
             }
 
         }
-
+        #endregion
 
 
         //------------------------------------ ENCOMENDA ---------------------

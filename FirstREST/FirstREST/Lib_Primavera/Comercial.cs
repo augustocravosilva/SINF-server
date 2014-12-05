@@ -36,17 +36,19 @@ namespace FirstREST.Lib_Primavera
 
             if (PriEngine.InitializeCompany(NomeEmpresa,user,password) == true)
             {
-
-                //objList = PriEngine.Engine.Comercial.Clientes.LstClientes();
-
-                objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Moeda, NumContrib as NumContribuinte FROM  CLIENTES");
+                objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Fac_Mor, Fac_Local, Fac_Cp, Fac_Cploc, CDU_EMAIL as Email, NumContrib as NumContribuinte FROM  CLIENTES");
 
                 while (!objList.NoFim())
                 {
                     cli = new Model.Cliente();
-                    cli.CodCliente = objList.Valor("Cliente");
-                    cli.NomeCliente = objList.Valor("Nome");
-                    cli.NumContribuinte = objList.Valor("NumContribuinte");
+                    cli.id = objList.Valor("Cliente");
+                    cli.name = objList.Valor("Nome");
+                    cli.tax_id = objList.Valor("NumContribuinte");
+                    cli.email = objList.Valor("Email");
+                    cli.street = objList.Valor("Fac_Mor");
+                    cli.city = objList.Valor("Fac_Local");
+                    cli.zip_code1 = objList.Valor("Fac_Cp");
+                    cli.zip_code2 = objList.Valor("Fac_Cploc");
 
                     listClientes.Add(cli);
                     objList.Seguinte();
@@ -74,9 +76,19 @@ namespace FirstREST.Lib_Primavera
                 if (PriEngine.Engine.Comercial.Clientes.Existe(codCliente) == true)
                 {
                     objCli = PriEngine.Engine.Comercial.Clientes.Edita(codCliente);
-                    myCli.CodCliente = objCli.get_Cliente();
-                    myCli.NomeCliente = objCli.get_Nome();
-                    myCli.NumContribuinte = objCli.get_NumContribuinte();
+                    myCli.id = objCli.get_Cliente();
+                    myCli.name = objCli.get_Nome();
+                    myCli.tax_id = objCli.get_NumContribuinte();
+                    foreach (StdBECampo campo in objCli.get_CamposUtil())
+                    {
+                        if (campo.Nome.Equals("CDU_EMAIL"))
+                            myCli.email = campo.Valor;
+                    }
+                    myCli.street = objCli.get_Morada();
+                    myCli.city = objCli.get_Localidade();
+                    myCli.zip_code1 = objCli.get_CodigoPostal();
+                    myCli.zip_code2 = objCli.get_LocalidadeCodigoPostal();
+
                     return myCli;
                 }
                 else
@@ -90,9 +102,6 @@ namespace FirstREST.Lib_Primavera
 
         public static Lib_Primavera.Model.RespostaErro UpdCliente(Lib_Primavera.Model.Cliente cliente)
         {
-
-
-
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
             ErpBS objMotor = new ErpBS();
 

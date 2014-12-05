@@ -7,7 +7,6 @@ namespace FirstREST.Lib_Primavera.Model
 {
     public class Cliente
     {
-
         public string CodCliente
         {
             get;
@@ -26,35 +25,20 @@ namespace FirstREST.Lib_Primavera.Model
             set;
         }
 
-        public string Rua
-        {
-            get;
-            set;
-        }
+        public string id { get; set; }
 
-        public string Cidade
-        {
-            get;
-            set;
-        }
+        public string name { get; set; }
 
-        public string CodPostal1
-        {
-            get;
-            set;
-        }
+        public string tax_id { get; set; }
 
-        public string CodPostal2
-        {
-            get;
-            set;
-        }
+        public string email { get; set; }
 
-        public string Email
-        {
-            get;
-            set;
-        }
+        public string street { get; set; }
 
+        public string city { get; set; }
+
+        public string zip_code1 { get; set; }
+
+        public string zip_code2 { get; set; }
     }
 }

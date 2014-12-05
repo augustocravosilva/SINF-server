@@ -12,15 +12,14 @@ namespace FirstREST.Controllers
     public class ClientesController : ApiController
     {
         //
-        // GET: /Clientes/
-
+        // GET: api/Clientes/
         public IEnumerable<Lib_Primavera.Model.Cliente> Get()
         {
             return Lib_Primavera.Comercial.ListaClientes();
         }
 
 
-        // GET api/cliente/5    
+        // GET api/Clientes/:id    
         public Cliente Get(string id)
         {
             Lib_Primavera.Model.Cliente cliente = Lib_Primavera.Comercial.GetCliente(id);

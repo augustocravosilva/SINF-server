@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -19,14 +18,28 @@ namespace FirstREST.Controllers
            public Artigo product { get; set; }
         }
 
+        public class ProductsAnswer
+        {
+            public List<Artigo> products { get; set; }
+        }
+
         //
         // GET: /Artigos/
 
-        public IEnumerable<Lib_Primavera.Model.Artigo> Get()
+        public ProductsAnswer Get()
         {
-            return Lib_Primavera.Comercial.ListaArtigos();
+            ProductsAnswer answer = new ProductsAnswer();
+            answer.products = Lib_Primavera.Comercial.ListaArtigos();
+            return answer;
         }
 
+        [HttpGet]
+        public ProductsAnswer ByCategory(string id)
+        {
+            ProductsAnswer answer = new ProductsAnswer();
+            answer.products = Lib_Primavera.Comercial.ListaArtigos(id);
+            return answer;
+        }
 
         // GET api/artigo/5    
         public ProductAnswer Get(string id)

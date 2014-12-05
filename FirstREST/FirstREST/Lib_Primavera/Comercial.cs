@@ -283,8 +283,10 @@ namespace FirstREST.Lib_Primavera
                 }
                 else
                 {
-                    
                     objArtigo = PriEngine.Engine.Comercial.Artigos.Edita(codArtigo);
+                    string pai = objArtigo.get_ArtigoPai();
+                    if (pai.Length>0)
+                        return null;
                     myArt.id = objArtigo.get_Artigo();
                     myArt.name = objArtigo.get_Descricao();
                     myArt.category = objArtigo.get_SubFamilia();
@@ -338,13 +340,12 @@ namespace FirstREST.Lib_Primavera
 
         }
 
-        public static List<Model.Artigo> ListaArtigos()
+        public static List<Model.Artigo> ListaArtigos(string category = null)
         {
             ErpBS objMotor = new ErpBS();
            
             StdBELista objList;
 
-            Model.Artigo art = new Model.Artigo();
             List<Model.Artigo> listArts = new List<Model.Artigo>();
 
             if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
@@ -354,9 +355,10 @@ namespace FirstREST.Lib_Primavera
 
                 while (!objList.NoFim())
                 {
-                    art = new Model.Artigo();
-
-                    listArts.Add(art);
+                    string id = objList.Valor("artigo");
+                    Model.Artigo art = GetArtigo(id);
+                    if(art!=null && ( art.category.Equals(category) || category == null))
+                        listArts.Add(art);
                     objList.Seguinte();
                 }
 

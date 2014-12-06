@@ -11,7 +11,7 @@ namespace FirstREST.Controllers
 {
     public class ClientesController : ApiController
     {
-        //
+        
         // GET: api/Clientes/
         public IEnumerable<Lib_Primavera.Model.Cliente> Get()
         {
@@ -35,7 +35,7 @@ namespace FirstREST.Controllers
             }
         }
 
-
+        // POST api/Clientes/:id/
         public HttpResponseMessage Post(Lib_Primavera.Model.Cliente cliente)
         {
             Lib_Primavera.Model.RespostaErro erro = new Lib_Primavera.Model.RespostaErro();

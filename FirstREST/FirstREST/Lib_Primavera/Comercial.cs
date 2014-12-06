@@ -109,8 +109,7 @@ namespace FirstREST.Lib_Primavera
 
             try
             {
-
-                if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+                if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
                 {
 
                     if (PriEngine.Engine.Comercial.Clientes.Existe(cliente.CodCliente) == false)
@@ -200,7 +199,7 @@ namespace FirstREST.Lib_Primavera
 
         }
 
-
+        
         public static Lib_Primavera.Model.RespostaErro InsereClienteObj(Model.Cliente cli)
         {
 
@@ -210,13 +209,13 @@ namespace FirstREST.Lib_Primavera
 
             try
             {
-                if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+                if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
                 {
 
-                    myCli.set_Cliente(cli.CodCliente);
-                    myCli.set_Nome(cli.NomeCliente);
-                    myCli.set_NumContribuinte(cli.NumContribuinte);
-
+                    myCli.set_Cliente(cli.id);
+                    myCli.set_Nome(cli.name);
+                    myCli.set_NumContribuinte(cli.tax_id);
+                    //myCli.set_CamposUtil().
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
 
                     erro.Erro = 0;
@@ -249,7 +248,7 @@ namespace FirstREST.Lib_Primavera
 
             GcpBECliente myCli = new GcpBECliente();
 
-            objMotor = mp.AbreEmpresa("DEMO", "", "", "Default");
+            objMotor = mp.AbreEmpresa(NomeEmpresa, user, password);
 
             myCli.set_Cliente(codCliente);
             myCli.set_Nome(nomeCliente);
@@ -260,8 +259,8 @@ namespace FirstREST.Lib_Primavera
 
         }
 
-
         */
+        
 
 
         #endregion Cliente;   // -----------------------------  END   CLIENTE    -----------------------

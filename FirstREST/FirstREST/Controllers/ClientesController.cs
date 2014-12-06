@@ -45,8 +45,8 @@ namespace FirstREST.Controllers
             {
                 var response = Request.CreateResponse(
                    HttpStatusCode.Created, cliente);
-                string uri = Url.Link("DefaultApi", new { CodCliente = cliente.CodCliente });
-                response.Headers.Location = new Uri(uri);
+               // string uri = Url.Link("DefaultApi", new { CodCliente = cliente.CodCliente });
+               // response.Headers.Location = new Uri(uri);
                 return response;
             }
 
@@ -54,7 +54,6 @@ namespace FirstREST.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
-
         }
 
 

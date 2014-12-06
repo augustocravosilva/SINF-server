@@ -214,10 +214,10 @@ namespace FirstREST.Lib_Primavera
 
                     myCli.set_Cliente(cli.id);
                     myCli.set_Nome(cli.name);
-                    myCli.set_NumContribuinte(cli.tax_id);
-                    //myCli.set_CamposUtil().
+                    /*myCli.set_NumContribuinte(cli.tax_id);
+                    //myCli.set_CamposUtil().*/
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
-
+                    
                     erro.Erro = 0;
                     erro.Descricao = "Sucesso";
                     return erro;

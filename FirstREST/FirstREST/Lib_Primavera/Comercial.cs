@@ -124,10 +124,10 @@ namespace FirstREST.Lib_Primavera
                         objCli = PriEngine.Engine.Comercial.Clientes.Edita(cliente.CodCliente);
                         objCli.set_EmModoEdicao(true);
 
-                        objCli.set_Nome(cliente.NomeCliente);
-                        objCli.set_NumContribuinte(cliente.NumContribuinte);
+                        objCli.set_Nome(cliente.name);
+                        //objCli.set_NumContribuinte(cliente.NumContribuinte);
 
-                        PriEngine.Engine.Comercial.Clientes.Actualiza(objCli);
+                        //PriEngine.Engine.Comercial.Clientes.Actualiza(objCli);
 
                         erro.Erro = 0;
                         erro.Descricao = "Sucesso";
@@ -199,7 +199,7 @@ namespace FirstREST.Lib_Primavera
 
         }
 
-        
+
         public static Lib_Primavera.Model.RespostaErro InsereClienteObj(Model.Cliente cli)
         {
 
@@ -214,8 +214,13 @@ namespace FirstREST.Lib_Primavera
 
                     myCli.set_Cliente(cli.id);
                     myCli.set_Nome(cli.name);
-                    /*myCli.set_NumContribuinte(cli.tax_id);
-                    //myCli.set_CamposUtil().*/
+                    myCli.set_NumContribuinte(cli.tax_id);
+                    myCli.set_Morada(cli.street);
+                    myCli.set_Localidade(cli.city);
+                    myCli.set_CodigoPostal(cli.zip_code1);
+                    myCli.set_LocalidadeCodigoPostal(cli.zip_code2);
+                    //myCli.set_CamposUtil(cli.email); //*/
+                    
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
                     
                     erro.Erro = 0;

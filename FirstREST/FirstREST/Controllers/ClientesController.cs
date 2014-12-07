@@ -40,13 +40,13 @@ namespace FirstREST.Controllers
         {
             Lib_Primavera.Model.RespostaErro erro = new Lib_Primavera.Model.RespostaErro();
             erro = Lib_Primavera.Comercial.InsereClienteObj(cliente);
-
+            
             if (erro.Erro == 0)
             {
                 var response = Request.CreateResponse(
                    HttpStatusCode.Created, cliente);
-               // string uri = Url.Link("DefaultApi", new { CodCliente = cliente.CodCliente });
-               // response.Headers.Location = new Uri(uri);
+                string uri = Url.Link("DefaultApi", new { CodCliente = cliente.CodCliente });
+                response.Headers.Location = new Uri(uri);
                 return response;
             }
 

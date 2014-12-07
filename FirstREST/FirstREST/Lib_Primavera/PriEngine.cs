@@ -16,9 +16,12 @@ namespace FirstREST.Lib_Primavera
 
         public static StdPlatBS Platform { get; set; }
         public static ErpBS Engine { get; set; }
+        private static bool inicializado = false;
 
         public static bool InitializeCompany(string Company, string User, string Password)
         {
+            if (inicializado)
+                return true;
 
             StdBSConfApl objAplConf = new StdBSConfApl();
             StdPlatBS Plataforma = new StdPlatBS();
@@ -52,6 +55,7 @@ namespace FirstREST.Lib_Primavera
                 // Returns the engine.
                 Engine = MotorLE;
 
+                inicializado = true;
                 return true;
             }
             else

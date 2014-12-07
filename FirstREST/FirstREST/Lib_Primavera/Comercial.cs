@@ -22,7 +22,33 @@ namespace FirstREST.Lib_Primavera
         public const string user = "TBAdmin";
         public const string password = "techbags00";
 
+        public static void start()
+        {
+            PriEngine.InitializeCompany(NomeEmpresa, user, password);
+        }
+
         # region Cliente
+
+        public static string ValidaCliente(string useremail, string userpassword)
+        {
+             
+            StdBELista objList;
+
+            if (PriEngine.InitializeCompany(NomeEmpresa,user,password) == true)
+            {
+                string select = "SELECT Cliente FROM CLIENTES where CDU_EMAIL LIKE '" + useremail +
+                "' and CDU_PASSWORD LIKE '" + userpassword + "'";
+                objList = PriEngine.Engine.Consulta(select);
+
+                if (objList.NoFim())
+                    return null;
+                string cod = objList.Valor("Cliente");
+                return cod;
+
+            }
+
+                return null;
+        }
 
         public static List<Model.Cliente> ListaClientes()
         {

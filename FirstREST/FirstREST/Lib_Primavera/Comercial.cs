@@ -190,7 +190,7 @@ namespace FirstREST.Lib_Primavera
             try
             {
 
-                if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+                if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
                 {
                     if (PriEngine.Engine.Comercial.Clientes.Existe(codCliente) == false)
                     {
@@ -230,25 +230,68 @@ namespace FirstREST.Lib_Primavera
         {
 
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
-         
+
             GcpBECliente myCli = new GcpBECliente();
+            StdBECampos cmps = new StdBECampos();
+            StdBECampo cmp = new StdBECampo();
 
             try
             {
                 if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
                 {
+                    List<Model.Cliente> clientes = ListaClientes();
+                    string new_id;
 
-                    myCli.set_Cliente(cli.id);
+                    if (clientes.Count >= 2)
+                    {
+
+                        Model.Cliente last;
+
+                        if (clientes[clientes.Count - 1].id == "VD")
+                            last = clientes[clientes.Count - 2];
+                        else
+                            last = clientes[clientes.Count - 1];
+
+                        int value = int.Parse(last.id.Substring(1, 3));
+                        int new_value = value + 1;
+                        new_id = "C" + new_value.ToString("D3");
+                    }
+                    else
+                        new_id = "C001";
+
+                    myCli.set_Cliente(new_id);
+
+                    if (cli.name == null)
+                    {
+                        erro.Erro = 1;
+                        erro.Descricao = "É necessário nome";
+                        return erro;
+                    }
                     myCli.set_Nome(cli.name);
+
                     myCli.set_NumContribuinte(cli.tax_id);
                     myCli.set_Morada(cli.street);
                     myCli.set_Localidade(cli.city);
                     myCli.set_CodigoPostal(cli.zip_code1);
                     myCli.set_LocalidadeCodigoPostal(cli.zip_code2);
                     myCli.set_Moeda("EUR");
-                    //myCli.set_CamposUtil(cli.email); //*/
+
+                    if (cli.email == null)
+                    {
+                        erro.Erro = 1;
+                        erro.Descricao = "É necessário email";
+                        return erro;
+                    }
+                    else
+                    {
+                        cmp.Nome = "CDU_Email";
+                        cmp.Valor = cli.email;
+                        cmps.Insere(cmp);
+                    }
+
+                    myCli.set_CamposUtil(cmps);
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
-                    
+
                     erro.Erro = 0;
                     erro.Descricao = "Sucesso";
                     return erro;
@@ -270,29 +313,6 @@ namespace FirstREST.Lib_Primavera
 
 
         }
-
-        /*
-        public static void InsereCliente(string codCliente, string nomeCliente, string numContribuinte, string moeda)
-        {
-            ErpBS objMotor = new ErpBS();
-            MotorPrimavera mp = new MotorPrimavera();
-
-            GcpBECliente myCli = new GcpBECliente();
-
-            objMotor = mp.AbreEmpresa(NomeEmpresa, user, password);
-
-            myCli.set_Cliente(codCliente);
-            myCli.set_Nome(nomeCliente);
-            myCli.set_NumContribuinte(numContribuinte);
-            myCli.set_Moeda(moeda);
-
-            objMotor.Comercial.Clientes.Actualiza(myCli);
-
-        }
-
-        */
-        
-
 
         #endregion Cliente;   // -----------------------------  END   CLIENTE    -----------------------
 

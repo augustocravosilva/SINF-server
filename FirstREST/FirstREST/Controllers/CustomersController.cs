@@ -13,8 +13,8 @@ namespace FirstREST.Controllers
 {
     public class CustomersController : ApiController
     {
-        
-        // GET: api/Clientes/
+
+        // GET: api/Customers/
         public IEnumerable<Lib_Primavera.Model.Cliente> Get()
         {
             return Lib_Primavera.Comercial.ListaClientes();
@@ -34,7 +34,7 @@ namespace FirstREST.Controllers
             throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound)); 
         }
 
-        // GET api/Clientes/:id    
+        // GET api/Customers/:id    
         public Cliente Get(string id)
         {
             Lib_Primavera.Model.Cliente cliente = Lib_Primavera.Comercial.GetCliente(id);
@@ -50,7 +50,7 @@ namespace FirstREST.Controllers
             }
         }
 
-        // POST api/Clientes
+        // POST api/Customers
         [HttpPost]
         public HttpResponseMessage Post(Lib_Primavera.Model.Cliente cliente)
         {
@@ -65,7 +65,7 @@ namespace FirstREST.Controllers
 
             else
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,erro.Descricao);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, erro.Descricao);
             }
         }
 

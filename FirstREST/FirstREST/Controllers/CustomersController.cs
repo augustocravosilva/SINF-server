@@ -71,7 +71,7 @@ namespace FirstREST.Controllers
 
         // PUT api/Customers/:id
         [HttpPut]
-        public HttpResponseMessage Put(int id, Lib_Primavera.Model.Cliente cliente)
+        public HttpResponseMessage Put(Lib_Primavera.Model.Cliente cliente)
         {
 
             Lib_Primavera.Model.RespostaErro erro = new Lib_Primavera.Model.RespostaErro();

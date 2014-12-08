@@ -289,6 +289,18 @@ namespace FirstREST.Lib_Primavera
                         cmps.Insere(cmp);
                     }
 
+                    /*if (cli.password == null)
+                    {
+                        erro.Erro = 1;
+                        erro.Descricao = "É necessário password";
+                        return erro;
+                    }
+                    else
+                    {
+                        cmp.Nome = "CDU_Password";
+                        cmp.Valor = cli.password;
+                        cmps.Insere(cmp);
+                    }*/
                     myCli.set_CamposUtil(cmps);
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
 

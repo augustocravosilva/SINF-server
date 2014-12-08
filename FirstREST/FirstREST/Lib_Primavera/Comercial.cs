@@ -10,6 +10,7 @@ using Interop.GcpBE800;
 using Interop.IBasBS800;
 using ADODB;
 using Interop.IGcpBS800;
+using FirstREST.Lib_Primavera.Model;
 //using Interop.StdBESql800;
 //using Interop.StdBSSql800;
 
@@ -18,13 +19,14 @@ namespace FirstREST.Lib_Primavera
     public class Comercial
     {
 
-        public const string NomeEmpresa = "TECHBAGS";
-        public const string user = "TBAdmin";
-        public const string password = "techbags00";
+        
 
-        public static void start()
+        public static bool start()
         {
-            PriEngine.InitializeCompany(NomeEmpresa, user, password);
+            const string NomeEmpresa = "TECHBAGS";
+            const string user = "TBAdmin";
+            const string password = "techbags00";
+            return PriEngine.InitializeCompany(NomeEmpresa, user, password);
         }
 
         # region Cliente
@@ -34,7 +36,7 @@ namespace FirstREST.Lib_Primavera
              
             StdBELista objList;
 
-            if (PriEngine.InitializeCompany(NomeEmpresa,user,password) == true)
+            if (start() == true)
             {
                 string select = "SELECT Cliente FROM CLIENTES where CDU_EMAIL LIKE '" + useremail +
                 "' and CDU_PASSWORD LIKE '" + userpassword + "'";
@@ -51,16 +53,14 @@ namespace FirstREST.Lib_Primavera
         }
 
         public static List<Model.Cliente> ListaClientes()
-        {
-            ErpBS objMotor = new ErpBS();
-             
+        {             
             StdBELista objList;
 
             Model.Cliente cli = new Model.Cliente();
             List<Model.Cliente> listClientes = new List<Model.Cliente>();
 
 
-            if (PriEngine.InitializeCompany(NomeEmpresa,user,password) == true)
+            if (start() == true)
             {
                 objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Fac_Mor, Fac_Local, Fac_Cp, Fac_Cploc, CDU_EMAIL as Email, NumContrib as NumContribuinte FROM  CLIENTES");
 
@@ -89,26 +89,27 @@ namespace FirstREST.Lib_Primavera
 
         public static Lib_Primavera.Model.Cliente GetCliente(string codCliente)
         {
-            ErpBS objMotor = new ErpBS();
-
-            GcpBECliente objCli = new GcpBECliente();
+            GcpBECliente objCli;
 
 
             Model.Cliente myCli = new Model.Cliente();
 
-            if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
+            if (start() == true)
             {
 
                 if (PriEngine.Engine.Comercial.Clientes.Existe(codCliente) == true)
                 {
-                    objCli = PriEngine.Engine.Comercial.Clientes.Edita(codCliente);
+                    objCli = PriEngine.Engine.Comercial.Clientes.Consulta(codCliente);
                     myCli.id = objCli.get_Cliente();
                     myCli.name = objCli.get_Nome();
                     myCli.tax_id = objCli.get_NumContribuinte();
                     foreach (StdBECampo campo in objCli.get_CamposUtil())
                     {
                         if (campo.Nome.Equals("CDU_EMAIL"))
+                        {
                             myCli.email = campo.Valor;
+                            break;
+                        }
                     }
                     myCli.street = objCli.get_Morada();
                     myCli.city = objCli.get_Localidade();
@@ -129,13 +130,12 @@ namespace FirstREST.Lib_Primavera
         public static Lib_Primavera.Model.RespostaErro UpdCliente(Lib_Primavera.Model.Cliente cliente)
         {
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
-            ErpBS objMotor = new ErpBS();
 
             GcpBECliente objCli = new GcpBECliente();
 
             try
             {
-                if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
+                if (start() == true)
                 {
 
                     if (PriEngine.Engine.Comercial.Clientes.Existe(cliente.id) == false)
@@ -227,7 +227,7 @@ namespace FirstREST.Lib_Primavera
             try
             {
 
-                if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
+                if (start() == true)
                 {
                     if (PriEngine.Engine.Comercial.Clientes.Existe(codCliente) == false)
                     {
@@ -274,7 +274,7 @@ namespace FirstREST.Lib_Primavera
 
             try
             {
-                if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
+                if (start() == true)
                 {
                     List<Model.Cliente> clientes = ListaClientes();
                     string new_id;
@@ -376,7 +376,7 @@ namespace FirstREST.Lib_Primavera
             GcpBEArtigo objArtigo = new GcpBEArtigo();
             Model.Artigo myArt = new Model.Artigo();
 
-            if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
+            if (start() == true)
             {
 
                 if (PriEngine.Engine.Comercial.Artigos.Existe(codArtigo) == false)
@@ -385,7 +385,7 @@ namespace FirstREST.Lib_Primavera
                 }
                 else
                 {
-                    objArtigo = PriEngine.Engine.Comercial.Artigos.Edita(codArtigo);
+                    objArtigo = PriEngine.Engine.Comercial.Artigos.Consulta(codArtigo);
                     string pai = objArtigo.get_ArtigoPai();
                     if (pai.Length>0)
                         return null;
@@ -408,8 +408,8 @@ namespace FirstREST.Lib_Primavera
                         Model.SubProduct sub = new Model.SubProduct();
                         sub.color = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao1();
                         sub.size = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao2();
-                        string subname = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
-                        sub.stock = (int)PriEngine.Engine.Comercial.Artigos.Edita(subname).get_StkActual();
+                        sub.id = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
+                        sub.stock = (int)PriEngine.Engine.Comercial.Artigos.Consulta(sub.id).get_StkActual();
                         subproducts.Add(sub);
                     }
 
@@ -443,14 +443,12 @@ namespace FirstREST.Lib_Primavera
         }
 
         public static List<Model.Artigo> ListaArtigos(string category = null)
-        {
-            ErpBS objMotor = new ErpBS();
-           
+        {           
             StdBELista objList;
 
             List<Model.Artigo> listArts = new List<Model.Artigo>();
 
-            if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
+            if (start() == true)
             {
 
                 objList = PriEngine.Engine.Comercial.Artigos.LstArtigos();
@@ -550,7 +548,7 @@ namespace FirstREST.Lib_Primavera
 
 
         // ------------------------ Documentos de Compra --------------------------//
-
+/*
         public static List<Model.DocCompra> VGR_List()
         {
             ErpBS objMotor = new ErpBS();
@@ -665,12 +663,12 @@ namespace FirstREST.Lib_Primavera
             }
         }
         
-
+        */
 
         // ------ Documentos de venda ----------------------
 
-
-
+        #region venda
+        /*
         public static Model.RespostaErro Encomendas_New(Model.DocVenda dv)
         {
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
@@ -685,7 +683,7 @@ namespace FirstREST.Lib_Primavera
             
             try
             {
-                if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+                if (start() == true)
                 {
                     // Atribui valores ao cabecalho do doc
                     //myEnc.set_DataDoc(dv.Data);
@@ -728,53 +726,26 @@ namespace FirstREST.Lib_Primavera
                 return erro;
             }
         }
+        */
 
-
-        public static List<Model.DocVenda> Encomendas_List()
-        {
-            ErpBS objMotor = new ErpBS();
-            
+        public static List<Model.DocVendaForList> Encomendas_List(string customer)
+        {            
             StdBELista objListCab;
-            StdBELista objListLin;
-            Model.DocVenda dv = new Model.DocVenda();
-            List<Model.DocVenda> listdv = new List<Model.DocVenda>();
-            Model.LinhaDocVenda lindv = new Model.LinhaDocVenda();
-            List<Model.LinhaDocVenda> listlindv = new
-            List<Model.LinhaDocVenda>();
+            List<Model.DocVendaForList> listdv = new List<Model.DocVendaForList>();
 
-            if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+            if (start() == true)
             {
-                objListCab = PriEngine.Engine.Consulta("SELECT id, Entidade, Data, NumDoc, TotalMerc, Serie From CabecDoc where TipoDoc='ECL'");
+
+                string query = "SELECT id From CabecDoc where TipoDoc='ECL' and Entidade = '" + customer + "'";
+                objListCab = PriEngine.Engine.Consulta(query);
                 while (!objListCab.NoFim())
                 {
-                    dv = new Model.DocVenda();
+                    Model.DocVendaForList dv = new Model.DocVendaForList();
                     dv.id = objListCab.Valor("id");
-                    dv.Entidade = objListCab.Valor("Entidade");
-                    dv.NumDoc = objListCab.Valor("NumDoc");
-                    dv.Data = objListCab.Valor("Data");
-                    dv.TotalMerc = objListCab.Valor("TotalMerc");
-                    dv.Serie = objListCab.Valor("Serie");
-                    objListLin = PriEngine.Engine.Consulta("SELECT idCabecDoc, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasDoc where IdCabecDoc='" + dv.id + "' order By NumLinha");
-                    listlindv = new List<Model.LinhaDocVenda>();
-
-                    while (!objListLin.NoFim())
-                    {
-                        lindv = new Model.LinhaDocVenda();
-                        lindv.IdCabecDoc = objListLin.Valor("idCabecDoc");
-                        lindv.CodArtigo = objListLin.Valor("Artigo");
-                        lindv.DescArtigo = objListLin.Valor("Descricao");
-                        lindv.Quantidade = objListLin.Valor("Quantidade");
-                        lindv.Unidade = objListLin.Valor("Unidade");
-                        lindv.Desconto = objListLin.Valor("Desconto1");
-                        lindv.PrecoUnitario = objListLin.Valor("PrecUnit");
-                        lindv.TotalILiquido = objListLin.Valor("TotalILiquido");
-                        lindv.TotalLiquido = objListLin.Valor("PrecoLiquido");
-
-                        listlindv.Add(lindv);
-                        objListLin.Seguinte();
-                    }
-
-                    dv.LinhasDoc = listlindv;
+                    GcpBEDocumentoVenda venda = PriEngine.Engine.Comercial.Vendas.EditaID(dv.id);
+                    dv.date = venda.get_DataDoc();
+                    dv.total = venda.get_TotalDocumento();
+                    dv.state = venda.get_Estado();
                     listdv.Add(dv);
                     objListCab.Seguinte();
                 }
@@ -782,53 +753,61 @@ namespace FirstREST.Lib_Primavera
             return listdv;
         }
 
-
-        public static Model.DocVenda Encomenda_Get(string numdoc)
+        
+        public static Model.DocVenda Encomenda_Get(string id)
         {
-            ErpBS objMotor = new ErpBS();
-             
-            StdBELista objListCab;
-            StdBELista objListLin;
             Model.DocVenda dv = new Model.DocVenda();
             Model.LinhaDocVenda lindv = new Model.LinhaDocVenda();
             List<Model.LinhaDocVenda> listlindv = new List<Model.LinhaDocVenda>();
 
-            if (PriEngine.InitializeCompany("CENAS", "", "") == true)
+            if (start() == true)
             {
-                 
-                string st = "SELECT id, Entidade, Data, NumDoc, TotalMerc, Serie From CabecDoc where TipoDoc='ECL' and NumDoc='" + numdoc + "'";
-                objListCab = PriEngine.Engine.Consulta(st);
-                dv = new Model.DocVenda();
-                dv.id = objListCab.Valor("id");
-                dv.Entidade = objListCab.Valor("Entidade");
-                dv.NumDoc = objListCab.Valor("NumDoc");
-                dv.Data = objListCab.Valor("Data");
-                dv.TotalMerc = objListCab.Valor("TotalMerc");
-                dv.Serie = objListCab.Valor("Serie");
-                objListLin = PriEngine.Engine.Consulta("SELECT idCabecDoc, Artigo, Descricao, Quantidade, Unidade, PrecUnit, Desconto1, TotalILiquido, PrecoLiquido from LinhasDoc where IdCabecDoc='" + dv.id + "' order By NumLinha");
-                listlindv = new List<Model.LinhaDocVenda>();
+                GcpBEDocumentoVenda venda = PriEngine.Engine.Comercial.Vendas.EditaID(id);
 
-                while (!objListLin.NoFim())
+                if(venda==null)
+                    return null;
+
+                dv.id = id;
+                dv.customer = venda.get_Entidade();
+                dv.date = venda.get_DataDoc();
+                dv.state = venda.get_Estado();
+                dv.total = venda.get_TotalDocumento();
+                dv.delivery_adress = venda.get_MoradaEntrega();
+                dv.delivery_city = venda.get_LocalidadeEntrega();
+                dv.delivery_zip = venda.get_CodPostalEntrega() + "-" + venda.get_CodPostalLocalidadeEntrega();
+
+                GcpBELinhasDocumentoVenda linhas =  venda.get_Linhas();
+                for(int i = 1; i<= linhas.NumItens; i++)
                 {
-                    lindv = new Model.LinhaDocVenda();
-                    lindv.IdCabecDoc = objListLin.Valor("idCabecDoc");
-                    lindv.CodArtigo = objListLin.Valor("Artigo");
-                    lindv.DescArtigo = objListLin.Valor("Descricao");
-                    lindv.Quantidade = objListLin.Valor("Quantidade");
-                    lindv.Unidade = objListLin.Valor("Unidade");
-                    lindv.Desconto = objListLin.Valor("Desconto1");
-                    lindv.PrecoUnitario = objListLin.Valor("PrecUnit");
-                    lindv.TotalILiquido = objListLin.Valor("TotalILiquido");
-                    lindv.TotalLiquido = objListLin.Valor("PrecoLiquido");
-                    listlindv.Add(lindv);
-                    objListLin.Seguinte();
+                    GcpBELinhaDocumentoVenda linha = linhas[i];
+                    string idlinhapai =  linha.get_IdLinhaPai();
+                    string idlinha = linha.get_IdLinha();
+                    if(!idlinhapai.Equals(""))
+                    {
+                        LinhaDocVenda l = new LinhaDocVenda();
+
+                        string artigo = linha.get_Artigo();
+                        bool existe = PriEngine.Engine.Comercial.Artigos.Existe(artigo);
+                        GcpBEArtigo a = PriEngine.Engine.Comercial.Artigos.Consulta(artigo);
+                        string pai = a.get_ArtigoPai();
+
+                        l.product_id = pai;
+                        l.color = PriEngine.Engine.Comercial.Artigos.EditaDimensao(artigo).get_RubricaDimensao1();
+                        l.size = PriEngine.Engine.Comercial.Artigos.EditaDimensao(artigo).get_RubricaDimensao2();
+                        l.unit_price = linha.get_PrecUnit();
+                        l.quatity = linha.get_Quantidade();
+                        l.total = linha.get_TotalIliquido() + linha.get_TotalIva();
+                        listlindv.Add(l);
+                    }
                 }
 
-                dv.LinhasDoc = listlindv;
+
+                dv.lines = listlindv;
                 return dv;
             }
             return null;
         }
-
+        
     }
+        #endregion
 }

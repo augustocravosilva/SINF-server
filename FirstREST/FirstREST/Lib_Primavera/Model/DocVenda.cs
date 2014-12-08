@@ -5,6 +5,34 @@ using System.Web;
 
 namespace FirstREST.Lib_Primavera.Model
 {
+    public class DocVendaForList
+    {
+        public string id
+        {
+            get;
+            set;
+        }
+
+
+        public DateTime date
+        {
+            get;
+            set;
+        }
+
+        public double total
+        {
+            get;
+            set;
+        }
+
+        public string state
+        {
+            get;
+            set;
+        }
+    }
+
     public class DocVenda
     {
 
@@ -14,43 +42,44 @@ namespace FirstREST.Lib_Primavera.Model
             set;
         }
 
-        public string Entidade
+        public string customer
         {
             get;
             set;
         }
 
-        public int NumDoc
+
+        public DateTime date
         {
             get;
             set;
         }
 
-        public DateTime Data
+        public double total
         {
             get;
             set;
         }
 
-        public double TotalMerc
+        public string state
         {
             get;
             set;
         }
 
-        public string Serie
-        {
-            get;
-            set;
-        }
-
-        public List<Model.LinhaDocVenda> LinhasDoc
+        public List<Model.LinhaDocVenda> lines
 
         {
             get;
             set;
         }
- 
 
+
+
+        public string delivery_adress { get; set; }
+
+        public string delivery_city { get; set; }
+
+        public string delivery_zip { get; set; }
     }
 }

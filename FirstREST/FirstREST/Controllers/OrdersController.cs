@@ -7,22 +7,27 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using FirstREST.Lib_Primavera.Model;
+using FirstREST.Lib_Primavera;
 
 
 namespace FirstREST.Controllers
 {
-    public class DocVendaController : ApiController
+    public class OrdersController : ApiController
     {
-        //
-        // GET: /Clientes/
 
-        public IEnumerable<Lib_Primavera.Model.DocVenda> Get()
+        public class OrdersAnswer
         {
-            return Lib_Primavera.Comercial.Encomendas_List();
+            public List<DocVendaForList> orders { get; set; }
         }
 
+        public OrdersAnswer GetWithCustomer([FromUri] string customer)
+        {
+            OrdersAnswer o = new OrdersAnswer();
+            o.orders = Comercial.Encomendas_List(customer);
+            return o;
+        }
+        
 
-        // GET api/cliente/5    
         public Lib_Primavera.Model.DocVenda Get(string id)
         {
             Lib_Primavera.Model.DocVenda docvenda = Lib_Primavera.Comercial.Encomenda_Get(id);
@@ -37,8 +42,8 @@ namespace FirstREST.Controllers
                 return docvenda;
             }
         }
-
-
+        /*
+        
         public HttpResponseMessage Post(Lib_Primavera.Model.DocVenda dv)
         {
             Lib_Primavera.Model.RespostaErro erro = new Lib_Primavera.Model.RespostaErro();
@@ -58,7 +63,7 @@ namespace FirstREST.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-        }
+        }*/
 
 
         public HttpResponseMessage Put(int id, Lib_Primavera.Model.Cliente cliente)

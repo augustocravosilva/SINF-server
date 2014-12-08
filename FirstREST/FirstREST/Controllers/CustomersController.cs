@@ -26,7 +26,6 @@ namespace FirstREST.Controllers
             public string password { get; set; }
         }
 
-        [HttpPost]
         public string Login(LogInParams id)
         {
             string res = Lib_Primavera.Comercial.ValidaCliente(id.email, id.password);
@@ -51,24 +50,22 @@ namespace FirstREST.Controllers
             }
         }
 
-        // POST api/Clientes/:id/
+        // POST api/Clientes
+        [HttpPost]
         public HttpResponseMessage Post(Lib_Primavera.Model.Cliente cliente)
         {
-            Lib_Primavera.Model.RespostaErro erro = new Lib_Primavera.Model.RespostaErro();
-            erro = Lib_Primavera.Comercial.InsereClienteObj(cliente);
+            Lib_Primavera.Model.RespostaErro erro = Lib_Primavera.Comercial.InsereClienteObj(cliente);
             
             if (erro.Erro == 0)
             {
                 var response = Request.CreateResponse(
-                   HttpStatusCode.Created, cliente);
-                string uri = Url.Link("DefaultApi", new { CodCliente = cliente.CodCliente });
-                response.Headers.Location = new Uri(uri);
+                   HttpStatusCode.Created);
                 return response;
             }
 
             else
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest,erro.Descricao);
             }
         }
 

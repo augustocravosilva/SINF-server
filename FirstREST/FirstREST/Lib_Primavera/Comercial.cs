@@ -138,7 +138,7 @@ namespace FirstREST.Lib_Primavera
                 if (PriEngine.InitializeCompany(NomeEmpresa, user, password) == true)
                 {
 
-                    if (PriEngine.Engine.Comercial.Clientes.Existe(cliente.CodCliente) == false)
+                    if (PriEngine.Engine.Comercial.Clientes.Existe(cliente.id) == false)
                     {
                         erro.Erro = 1;
                         erro.Descricao = "O cliente não existe";
@@ -147,7 +147,7 @@ namespace FirstREST.Lib_Primavera
                     else
                     {
 
-                        objCli = PriEngine.Engine.Comercial.Clientes.Edita(cliente.CodCliente);
+                        objCli = PriEngine.Engine.Comercial.Clientes.Edita(cliente.id);
                         objCli.set_EmModoEdicao(true);
 
                         objCli.set_Nome(cliente.name);
@@ -245,8 +245,8 @@ namespace FirstREST.Lib_Primavera
                     myCli.set_Localidade(cli.city);
                     myCli.set_CodigoPostal(cli.zip_code1);
                     myCli.set_LocalidadeCodigoPostal(cli.zip_code2);
+                    myCli.set_Moeda("EUR");
                     //myCli.set_CamposUtil(cli.email); //*/
-                    
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
                     
                     erro.Erro = 0;

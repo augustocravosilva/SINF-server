@@ -146,14 +146,39 @@ namespace FirstREST.Lib_Primavera
                     }
                     else
                     {
+                        StdBECampos cmps = new StdBECampos();
+                        StdBECampo cmp = new StdBECampo();
 
                         objCli = PriEngine.Engine.Comercial.Clientes.Edita(cliente.id);
                         objCli.set_EmModoEdicao(true);
 
-                        objCli.set_Nome(cliente.name);
-                        //objCli.set_NumContribuinte(cliente.NumContribuinte);
+                        if(cliente.name != null)
+                            objCli.set_Nome(cliente.name);
 
-                        //PriEngine.Engine.Comercial.Clientes.Actualiza(objCli);
+                        if (cliente.tax_id != null)
+                            objCli.set_NumContribuinte(cliente.tax_id);
+
+                        if (cliente.email != null)
+                        {
+                            cmp.Nome = "CDU_Email";
+                            cmp.Valor = cliente.email;
+                            cmps.Insere(cmp);
+                            objCli.set_CamposUtil(cmps);
+                        }
+
+                        if (cliente.street != null)
+                            objCli.set_Morada(cliente.street);
+
+                        if (cliente.city != null)
+                            objCli.set_Localidade(cliente.city);
+
+                        if (cliente.zip_code1 != null)
+                            objCli.set_CodigoPostal(cliente.zip_code1);
+
+                        if (cliente.zip_code2 != null)
+                            objCli.set_LocalidadeCodigoPostal(cliente.zip_code2);
+
+                        PriEngine.Engine.Comercial.Clientes.Actualiza(objCli);
 
                         erro.Erro = 0;
                         erro.Descricao = "Sucesso";

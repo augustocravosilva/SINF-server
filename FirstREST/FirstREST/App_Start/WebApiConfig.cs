@@ -29,7 +29,7 @@ namespace FirstREST
             config.Routes.MapHttpRoute(
             name: "Get",
             routeTemplate: "api/{controller}/{id}",
-            defaults: new { id = RouteParameter.Optional },
+            defaults: new {action = "get", id = RouteParameter.Optional },
             constraints: new { httpMethod = new HttpMethodConstraint("GET") }
         );
 

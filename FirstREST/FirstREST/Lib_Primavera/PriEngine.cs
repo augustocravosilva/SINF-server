@@ -19,10 +19,10 @@ namespace FirstREST.Lib_Primavera
         private static bool inicializado = false;
 
         public static bool InitializeCompany(string Company, string User, string Password)
-        {/*
+        {
             if (inicializado)
                 return true;
-            */
+            
             StdBSConfApl objAplConf = new StdBSConfApl();
             StdPlatBS Plataforma = new StdPlatBS();
             ErpBS MotorLE = new ErpBS();

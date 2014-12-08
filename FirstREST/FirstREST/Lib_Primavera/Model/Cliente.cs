@@ -22,5 +22,7 @@ namespace FirstREST.Lib_Primavera.Model
         public string zip_code1 { get; set; }
 
         public string zip_code2 { get; set; }
+
+        public string password { get; set; }
     }
 }

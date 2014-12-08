@@ -158,11 +158,23 @@ namespace FirstREST.Lib_Primavera
                         if (cliente.tax_id != null)
                             objCli.set_NumContribuinte(cliente.tax_id);
 
-                        if (cliente.email != null)
+                        if (cliente.email != null || cliente.password != null)
                         {
-                            cmp.Nome = "CDU_Email";
-                            cmp.Valor = cliente.email;
-                            cmps.Insere(cmp);
+                            if (cliente.email != null)
+                            {
+                                cmp.Nome = "CDU_Email";
+                                cmp.Valor = cliente.email;
+                                cmps.Insere(cmp);
+                            }
+
+                            if (cliente.password != null)
+                            {
+                                cmp = new StdBECampo();
+                                cmp.Nome = "CDU_Password";
+                                cmp.Valor = PriEngine.Platform.Criptografia.Encripta(cliente.password, 50);
+                                cmps.Insere(cmp);
+                            }
+
                             objCli.set_CamposUtil(cmps);
                         }
 
@@ -314,7 +326,8 @@ namespace FirstREST.Lib_Primavera
                         cmps.Insere(cmp);
                     }
 
-                    /*if (cli.password == null)
+
+                    if (cli.password == null)
                     {
                         erro.Erro = 1;
                         erro.Descricao = "É necessário password";
@@ -322,10 +335,12 @@ namespace FirstREST.Lib_Primavera
                     }
                     else
                     {
-                        cmp.Nome = "CDU_Password";
+                        cmp = new StdBECampo();
+                        cmp.Nome = "CDU_PASSWORD";
                         cmp.Valor = cli.password;
                         cmps.Insere(cmp);
-                    }*/
+                    }
+
                     myCli.set_CamposUtil(cmps);
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
 

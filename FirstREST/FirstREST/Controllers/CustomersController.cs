@@ -69,7 +69,8 @@ namespace FirstREST.Controllers
             }
         }
 
-
+        // PUT api/Customers/:id
+        [HttpPut]
         public HttpResponseMessage Put(int id, Lib_Primavera.Model.Cliente cliente)
         {
 

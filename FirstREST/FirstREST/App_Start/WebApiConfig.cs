@@ -27,6 +27,13 @@ namespace FirstREST
           );
 
             config.Routes.MapHttpRoute(
+            name: "GetWithoutAny",
+            routeTemplate: "api/{controller}",
+            defaults: new { },
+            constraints: new { httpMethod = new HttpMethodConstraint("GET") }
+        );
+
+            config.Routes.MapHttpRoute(
             name: "Get",
             routeTemplate: "api/{controller}/{id}",
             defaults: new {action = "get", id = RouteParameter.Optional },

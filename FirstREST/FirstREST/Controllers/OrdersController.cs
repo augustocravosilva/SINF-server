@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+
 using FirstREST.Lib_Primavera.Model;
 using FirstREST.Lib_Primavera;
 
@@ -20,7 +21,8 @@ namespace FirstREST.Controllers
             public List<DocVendaForList> orders { get; set; }
         }
 
-        public OrdersAnswer GetWithCustomer([FromUri] string customer)
+        [System.Web.Http.HttpGet]
+        public OrdersAnswer WithCustomer([FromUri] string customer)
         {
             OrdersAnswer o = new OrdersAnswer();
             o.orders = Comercial.Encomendas_List(customer);
@@ -42,7 +44,7 @@ namespace FirstREST.Controllers
                 return docvenda;
             }
         }
-        /*
+        
         
         public HttpResponseMessage Post(Lib_Primavera.Model.DocVenda dv)
         {
@@ -52,18 +54,16 @@ namespace FirstREST.Controllers
             if (erro.Erro == 0)
             {
                 var response = Request.CreateResponse(
-                   HttpStatusCode.Created, dv.id);
-                string uri = Url.Link("DefaultApi", new {DocId = dv.id });
-                response.Headers.Location = new Uri(uri);
+                   HttpStatusCode.Created,erro.Descricao);
                 return response;
             }
 
             else
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return Request.CreateResponse(HttpStatusCode.BadRequest,erro.Descricao);
             }
 
-        }*/
+        }
 
         /*
         public HttpResponseMessage Put(int id, Lib_Primavera.Model.Cliente cliente)

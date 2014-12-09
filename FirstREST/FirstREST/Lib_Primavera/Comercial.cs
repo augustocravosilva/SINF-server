@@ -668,45 +668,84 @@ namespace FirstREST.Lib_Primavera
         // ------ Documentos de venda ----------------------
 
         #region venda
-        /*
+        
         public static Model.RespostaErro Encomendas_New(Model.DocVenda dv)
         {
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
-            GcpBEDocumentoVenda myEnc = new GcpBEDocumentoVenda();
-             
-            GcpBELinhaDocumentoVenda myLin = new GcpBELinhaDocumentoVenda();
 
+            GcpBEDocumentoVenda myEnc = new GcpBEDocumentoVenda();
+            
             GcpBELinhasDocumentoVenda myLinhas = new GcpBELinhasDocumentoVenda();
              
             PreencheRelacaoVendas rl = new PreencheRelacaoVendas();
-            List<Model.LinhaDocVenda> lstlindv = new List<Model.LinhaDocVenda>();
-            
+
+            DateTime time = DateTime.Now;
+
             try
             {
                 if (start() == true)
                 {
                     // Atribui valores ao cabecalho do doc
                     //myEnc.set_DataDoc(dv.Data);
-                    myEnc.set_Entidade(dv.Entidade);
-                    myEnc.set_Serie(dv.Serie);
+                    //myEnc.set_EmModoEdicao(true);
+                    myEnc.set_Entidade(dv.customer);
+                    myEnc.set_DataDoc(time);
+                   // myEnc.set_DataVenc(time);
+                    myEnc.set_Serie("A");
                     myEnc.set_Tipodoc("ECL");
                     myEnc.set_TipoEntidade("C");
-                    // Linhas do documento para a lista de linhas
-                    lstlindv = dv.LinhasDoc;
-                    PriEngine.Engine.Comercial.Vendas.PreencheDadosRelacionados(myEnc, rl);
-                    foreach (Model.LinhaDocVenda lin in lstlindv)
+                    myEnc.set_Seccao("2");//vendas a retalho
+                   // myEnc.set_Moeda("EUR");
+                   // myEnc.set_Cambio(1.0);
+                   // myEnc.set_CambioMBase(1.0);
+                   // myEnc.set_CambioMAlt(1.0);
+                    myEnc.set_CondPag("1"); // pronto pagamento
+                   // myEnc.set_EntidadeFac(dv.customer);
+
+
+                    foreach (Model.LinhaDocVenda lin in dv.lines)
                     {
-                        PriEngine.Engine.Comercial.Vendas.AdicionaLinha(myEnc, lin.CodArtigo, lin.Quantidade, "", "", lin.PrecoUnitario, lin.Desconto);
+                       double preco = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(lin.product_id)[1].get_PVP1();
+                        /*GcpBELinhaDocumentoVenda l = new GcpBELinhaDocumentoVenda();
+                        l.set_Artigo(lin.product_id);
+                        l.set_Quantidade(lin.quatity);
+                        l.set_QuantReservada(lin.quatity);
+                        l.set_TipoLinha("10");
+                        l.set_Unidade(PriEngine.Engine.Comercial.Artigos.Consulta(lin.product_id).get_UnidadeBase());
+                        l.set_DataEntrega(time);
+                        myLinhas.Insere(l);*/
+                        
+                       GcpBELinhasDocumentoVenda linhasArt = PriEngine.Engine.Comercial.Vendas.SugereArtigoLinhas(myEnc, lin.product_id, lin.quatity, "ACENT","",preco);
+                       for (int i = 1; i <= linhasArt.NumItens; i++ )
+                       {
+                           GcpBELinhaDocumentoVenda l = linhasArt[i];
+                           if (l.get_TipoLinha().Equals("10"))
+                           {
+                               l.set_DataEntrega(time);
+                               l.set_QuantReservada(lin.quatity);
+                           }
+                           myLinhas.Insere(l);
+                       }
                     }
 
-
+                    myEnc.set_Linhas(myLinhas);
+                    myEnc = PriEngine.Engine.Comercial.Vendas.PreencheDadosRelacionados(myEnc, PreencheRelacaoVendas.vdDadosTodos);
                    // PriEngine.Engine.Comercial.Compras.TransformaDocumento(
 
+
+                    if (dv.delivery_adress != null && dv.delivery_city != null && dv.delivery_zip1 != null && dv.delivery_zip2 != null)
+                    {
+                        myEnc.set_MoradaEntrega(dv.delivery_adress);
+                        myEnc.set_CodPostalEntrega(dv.delivery_zip1);
+                        myEnc.set_CodPostalLocalidadeEntrega(dv.delivery_zip2);
+                        myEnc.set_LocalidadeEntrega(dv.delivery_city);
+                    }
+
                     PriEngine.Engine.IniciaTransaccao();
-                    PriEngine.Engine.Comercial.Vendas.Actualiza(myEnc, "Teste");
+                    PriEngine.Engine.Comercial.Vendas.Actualiza(myEnc);
                     PriEngine.Engine.TerminaTransaccao();
                     erro.Erro = 0;
-                    erro.Descricao = "Sucesso";
+                    erro.Descricao = myEnc.get_ID();
                     return erro;
                 }
                 else
@@ -726,7 +765,7 @@ namespace FirstREST.Lib_Primavera
                 return erro;
             }
         }
-        */
+        
 
         public static List<Model.DocVendaForList> Encomendas_List(string customer)
         {            
@@ -772,9 +811,11 @@ namespace FirstREST.Lib_Primavera
                 dv.date = venda.get_DataDoc();
                 dv.state = venda.get_Estado();
                 dv.total = venda.get_TotalDocumento();
-                dv.delivery_adress = venda.get_MoradaEntrega();
-                dv.delivery_city = venda.get_LocalidadeEntrega();
-                dv.delivery_zip = venda.get_CodPostalEntrega() + "-" + venda.get_CodPostalLocalidadeEntrega();
+                GcpBECargaDescarga cd = venda.get_CargaDescarga();
+                dv.delivery_adress = cd.MoradaEntrega;
+                dv.delivery_city = cd.LocalidadeEntrega;
+                dv.delivery_zip1 = cd.CodPostalEntrega;
+                dv.delivery_zip2 = cd.CodPostalLocalidadeEntrega;
 
                 GcpBELinhasDocumentoVenda linhas =  venda.get_Linhas();
                 for(int i = 1; i<= linhas.NumItens; i++)

@@ -80,6 +80,8 @@ namespace FirstREST.Lib_Primavera.Model
 
         public string delivery_city { get; set; }
 
-        public string delivery_zip { get; set; }
+        public string delivery_zip1 { get; set; }
+
+        public string delivery_zip2 { get; set; }
     }
 }

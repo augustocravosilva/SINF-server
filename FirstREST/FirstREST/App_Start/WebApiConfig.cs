@@ -21,8 +21,8 @@ namespace FirstREST
 
             config.Routes.MapHttpRoute(
               name: "PutWithAction",
-              routeTemplate: "api/{controller}/{action}",
-              defaults: new { action = "put" },
+              routeTemplate: "api/{controller}/{id}",
+              defaults: new { id = RouteParameter.Optional },
               constraints: new { httpMethod = new HttpMethodConstraint("PUT") }
           );
 

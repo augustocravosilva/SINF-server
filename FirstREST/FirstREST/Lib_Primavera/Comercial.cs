@@ -127,7 +127,7 @@ namespace FirstREST.Lib_Primavera
                 return null;
         }
 
-        public static Lib_Primavera.Model.RespostaErro UpdCliente(Lib_Primavera.Model.Cliente cliente)
+        public static Lib_Primavera.Model.RespostaErro UpdCliente(string id, Lib_Primavera.Model.Cliente cliente)
         {
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
 
@@ -138,7 +138,7 @@ namespace FirstREST.Lib_Primavera
                 if (start() == true)
                 {
 
-                    if (PriEngine.Engine.Comercial.Clientes.Existe(cliente.id) == false)
+                    if (PriEngine.Engine.Comercial.Clientes.Existe(id) == false)
                     {
                         erro.Erro = 1;
                         erro.Descricao = "O cliente não existe";
@@ -149,7 +149,7 @@ namespace FirstREST.Lib_Primavera
                         StdBECampos cmps = new StdBECampos();
                         StdBECampo cmp = new StdBECampo();
 
-                        objCli = PriEngine.Engine.Comercial.Clientes.Edita(cliente.id);
+                        objCli = PriEngine.Engine.Comercial.Clientes.Edita(id);
                         objCli.set_EmModoEdicao(true);
 
                         if(cliente.name != null)

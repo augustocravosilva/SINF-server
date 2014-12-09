@@ -71,14 +71,14 @@ namespace FirstREST.Controllers
 
         // PUT api/Customers/:id
         [HttpPut]
-        public HttpResponseMessage Put(Lib_Primavera.Model.Cliente cliente)
+        public HttpResponseMessage Put(string id, Lib_Primavera.Model.Cliente cliente)
         {
 
             Lib_Primavera.Model.RespostaErro erro = new Lib_Primavera.Model.RespostaErro();
 
             try
             {
-                erro = Lib_Primavera.Comercial.UpdCliente(cliente);
+                erro = Lib_Primavera.Comercial.UpdCliente(id,cliente);
                 if (erro.Erro == 0)
                 {
                     return Request.CreateResponse(HttpStatusCode.OK, erro.Descricao);
@@ -91,7 +91,7 @@ namespace FirstREST.Controllers
 
             catch (Exception exc)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, erro.Descricao);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, exc.ToString());
             }
         }
 

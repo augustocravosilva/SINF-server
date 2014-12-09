@@ -65,7 +65,7 @@ namespace FirstREST.Controllers
 
         }*/
 
-
+        /*
         public HttpResponseMessage Put(int id, Lib_Primavera.Model.Cliente cliente)
         {
 
@@ -73,7 +73,7 @@ namespace FirstREST.Controllers
 
             try
             {
-                erro = Lib_Primavera.Comercial.UpdCliente(cliente);
+                erro = Lib_Primavera.Comercial.UpdCliente(id,cliente);
                 if (erro.Erro == 0)
                 {
                     return Request.CreateResponse(HttpStatusCode.OK, erro.Descricao);
@@ -89,7 +89,7 @@ namespace FirstREST.Controllers
                 return Request.CreateResponse(HttpStatusCode.BadRequest, erro.Descricao);
             }
         }
-
+        */
 
 
         public HttpResponseMessage Delete(string id)

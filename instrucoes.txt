@@ -1,0 +1,42 @@
+instrucoes
+
+1 - abrir primavera professional administrator
+2 - criar nova empresa, codigo: TECHBAGS ; continuar processo...
+3 - escolher ficheiro de backup que esta nesta pasta .BAK
+4 - vai dar erro. copiar os comandos sql que diz no erro
+5 - Abrir sql server, nova query, colar cada 1 dos comandos e correr (Execute query)
+6 - continuar importaçao e finalizar wizard
+
+7 - Ir a utilizadores, novo... Utilizador:TBAdmin   ; escolher Super Administrador   ; confirmar
+8 - Fazer login com TBAdmin e sem password
+9 - Introduzir nova password 2x: techbags00
+
+10 - Seguir o shortcut "LP" que esta nesta pasta; copiar a pasta ANEXOS para lá
+
+11 - abrir o projecto FirstRest que está nesta pasta
+12 - eliminar referencias Interop e ADODB
+13 - re importar todos os ficheiros dll que comecam por Interop e ADODB
+	directorio: C:\Program Files\PRIMAVERA\SG800\Apl
+14 - Correr. Verificar execucao indo a http://localhost:49822/api/customers
+
+----
+Acesso fora da maquina virtual
+
+Nas preferencias da maq virtual, ir a Network, Port Forwarding
+Novo, colocar 49822 em Host e Guest port
+Confirmar
+
+Ir a C:\Users\user\Documents\IISExpress\config
+
+Abrir applicationhost com vs express
+Pesquisar "localhost" -> apagar todas as ocorrencias deixando algo como:  bindingInformation="*:49822:"
+
+Ir ao painel de controlo da MV e desligar firewall do windows
+
+No painel de controlo, action center, change user account control settings -> Never notify
+
+Re iniciar MV
+
+Com a app a correr na maq virtual, aceder a http://127.0.0.1:49822/
+e verificar se dá
+NAO FAZER http://localhost:49822/ NAO FUNCIONA

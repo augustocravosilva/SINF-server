@@ -26,10 +26,10 @@ namespace FirstREST.Controllers
             public string password { get; set; }
         }
 
-        public string Login(LogInParams id)
+        public Cliente Login(LogInParams id)
         {
-            string res = Lib_Primavera.Comercial.ValidaCliente(id.email, id.password);
-            if (res != null && !res.Equals(""))
+            Cliente res = Lib_Primavera.Comercial.ValidaCliente(id.email, id.password);
+            if (res != null)
                 return res;
             throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound)); 
         }

@@ -31,7 +31,7 @@ namespace FirstREST.Lib_Primavera
 
         # region Cliente
 
-        public static string ValidaCliente(string useremail, string userpassword)
+        public static Model.Cliente ValidaCliente(string useremail, string userpassword)
         {
              
             StdBELista objList;
@@ -45,7 +45,7 @@ namespace FirstREST.Lib_Primavera
                 if (objList.NoFim())
                     return null;
                 string cod = objList.Valor("Cliente");
-                return cod;
+                return GetCliente(cod);
 
             }
 
@@ -62,13 +62,14 @@ namespace FirstREST.Lib_Primavera
 
             if (start() == true)
             {
-                objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Fac_Mor, Fac_Local, Fac_Cp, Fac_Cploc, CDU_EMAIL as Email, NumContrib as NumContribuinte FROM  CLIENTES");
+                objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Fac_Mor, Fac_Local, Fac_Cp, Fac_Cploc, CDU_EMAIL as Email, NumContrib as NumContribuinte, NomeFiscal FROM  CLIENTES");
 
                 while (!objList.NoFim())
                 {
                     cli = new Model.Cliente();
                     cli.id = objList.Valor("Cliente");
                     cli.name = objList.Valor("Nome");
+                    cli.fiscal_name = objList.Valor("NomeFiscal");
                     cli.tax_id = objList.Valor("NumContribuinte");
                     cli.email = objList.Valor("Email");
                     cli.street = objList.Valor("Fac_Mor");
@@ -102,6 +103,7 @@ namespace FirstREST.Lib_Primavera
                     objCli = PriEngine.Engine.Comercial.Clientes.Consulta(codCliente);
                     myCli.id = objCli.get_Cliente();
                     myCli.name = objCli.get_Nome();
+                    myCli.fiscal_name = objCli.get_NomeFiscal();
                     myCli.tax_id = objCli.get_NumContribuinte();
                     foreach (StdBECampo campo in objCli.get_CamposUtil())
                     {
@@ -152,8 +154,11 @@ namespace FirstREST.Lib_Primavera
                         objCli = PriEngine.Engine.Comercial.Clientes.Edita(id);
                         objCli.set_EmModoEdicao(true);
 
-                        if(cliente.name != null)
+                        if (cliente.name != null)
+                        {
                             objCli.set_Nome(cliente.name);
+                            objCli.set_NomeFiscal(cliente.name);
+                        }
 
                         if (cliente.tax_id != null)
                             objCli.set_NumContribuinte(cliente.tax_id);
@@ -262,6 +267,24 @@ namespace FirstREST.Lib_Primavera
 
         }
 
+        public static bool existeEmail(string id, string email, bool insert)
+        {
+            StdBELista objList;
+            objList = PriEngine.Engine.Consulta("SELECT Cliente FROM  CLIENTES WHERE CDU_EMAIL='" + email + "'");
+
+            if (insert)
+            {
+                if (objList.Vazia())
+                    return false;
+
+                return true;
+            }
+            else
+            {
+
+            }
+            return true;
+        }
 
         public static Lib_Primavera.Model.RespostaErro InsereClienteObj(Model.Cliente cli)
         {
@@ -305,6 +328,7 @@ namespace FirstREST.Lib_Primavera
                         return erro;
                     }
                     myCli.set_Nome(cli.name);
+                    myCli.set_NomeFiscal(cli.name);
 
                     myCli.set_NumContribuinte(cli.tax_id);
                     myCli.set_Morada(cli.street);
@@ -317,6 +341,12 @@ namespace FirstREST.Lib_Primavera
                     {
                         erro.Erro = 1;
                         erro.Descricao = "É necessário email";
+                        return erro;
+                    }
+                    else if (existeEmail("", cli.email, true))
+                    {
+                        erro.Erro = 1;
+                        erro.Descricao = "Email já registado";
                         return erro;
                     }
                     else

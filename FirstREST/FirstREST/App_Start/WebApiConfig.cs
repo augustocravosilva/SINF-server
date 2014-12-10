@@ -3,10 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Filters;
 using System.Web.Routing;
 
 namespace FirstREST
 {
+
+    public class AddCustomHeaderFilter : ActionFilterAttribute
+    {
+        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        {
+            actionExecutedContext.Response.Content.Headers.Add("Access-Control-Allow-Origin", "*");
+            actionExecutedContext.Response.Content.Headers.Add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+        }
+    }
+
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
@@ -46,6 +57,8 @@ namespace FirstREST
              defaults: new { id = RouteParameter.Optional },
              constraints: new { httpMethod = new HttpMethodConstraint("GET") }
          );
+
+            config.Filters.Add(new AddCustomHeaderFilter());
            
             // Uncomment the following line of code to enable query support for actions with an IQueryable or IQueryable<T> return type.
             // To avoid processing unexpected or malicious queries, use the validation settings on QueryableAttribute to validate incoming queries.

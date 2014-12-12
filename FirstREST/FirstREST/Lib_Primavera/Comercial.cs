@@ -167,6 +167,13 @@ namespace FirstREST.Lib_Primavera
                         {
                             if (cliente.email != null)
                             {
+                                if (existeEmail(id, cliente.email, false))
+                                {
+                                    erro.Erro = 1;
+                                    erro.Descricao = "Email já registado";
+                                    return erro;
+                                }
+
                                 cmp.Nome = "CDU_Email";
                                 cmp.Valor = cliente.email;
                                 cmps.Insere(cmp);
@@ -272,16 +279,16 @@ namespace FirstREST.Lib_Primavera
             StdBELista objList;
             objList = PriEngine.Engine.Consulta("SELECT Cliente FROM  CLIENTES WHERE CDU_EMAIL='" + email + "'");
 
-            if (insert)
+            if (objList.Vazia())
+                return false;
+            else if (!insert)
             {
-                if (objList.Vazia())
-                    return false;
-
-                return true;
-            }
-            else
-            {
-
+                while (!objList.NoFim())
+                {
+                    if (objList.Valor("Cliente") == id)
+                        return false;
+                    objList.Seguinte();
+                }
             }
             return true;
         }

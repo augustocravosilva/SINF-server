@@ -279,18 +279,23 @@ namespace FirstREST.Lib_Primavera
             StdBELista objList;
             objList = PriEngine.Engine.Consulta("SELECT Cliente FROM  CLIENTES WHERE CDU_EMAIL='" + email + "'");
 
-            if (objList.Vazia())
-                return false;
-            else if (!insert)
+            if (objList != null)
             {
-                while (!objList.NoFim())
+                if (objList.Vazia())
+                    return false;
+                else if (!insert)
                 {
-                    if (objList.Valor("Cliente") == id)
-                        return false;
-                    objList.Seguinte();
+                    while (!objList.NoFim())
+                    {
+                        if (objList.Valor("Cliente") == id)
+                            return false;
+                        objList.Seguinte();
+                    }
+                    return true;
                 }
+                return false;
             }
-            return true;
+            return false;
         }
 
         public static Lib_Primavera.Model.RespostaErro InsereClienteObj(Model.Cliente cli)

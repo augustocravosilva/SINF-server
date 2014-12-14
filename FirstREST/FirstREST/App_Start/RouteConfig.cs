@@ -7,6 +7,7 @@ using System.Web.Routing;
 
 namespace FirstREST
 {
+
     public class RouteConfig
     {
         public static void RegisterRoutes(RouteCollection routes)
@@ -18,6 +19,8 @@ namespace FirstREST
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+
         }
     }
 }

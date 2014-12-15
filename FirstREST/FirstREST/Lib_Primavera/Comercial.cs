@@ -38,8 +38,9 @@ namespace FirstREST.Lib_Primavera
 
             if (start() == true)
             {
+                string password = PriEngine.Platform.Criptografia.Encripta(userpassword, 50);
                 string select = "SELECT Cliente FROM CLIENTES where CDU_EMAIL LIKE '" + useremail +
-                "' and CDU_PASSWORD LIKE '" + userpassword + "'";
+                "' and CDU_PASSWORD LIKE '" + password + "'";
                 objList = PriEngine.Engine.Consulta(select);
 
                 if (objList.NoFim())
@@ -62,7 +63,7 @@ namespace FirstREST.Lib_Primavera
 
             if (start() == true)
             {
-                objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Fac_Mor, Fac_Local, Fac_Cp, Fac_Cploc, CDU_EMAIL as Email, NumContrib as NumContribuinte, NomeFiscal FROM  CLIENTES");
+                objList = PriEngine.Engine.Consulta("SELECT Cliente, Nome, Fac_Mor, Fac_Local, Fac_Cp, Fac_Cploc, CDU_PASSWORD, CDU_EMAIL as Email, NumContrib as NumContribuinte, NomeFiscal FROM  CLIENTES");
 
                 while (!objList.NoFim())
                 {
@@ -76,6 +77,7 @@ namespace FirstREST.Lib_Primavera
                     cli.city = objList.Valor("Fac_Local");
                     cli.zip_code1 = objList.Valor("Fac_Cp");
                     cli.zip_code2 = objList.Valor("Fac_Cploc");
+                    cli.password = PriEngine.Platform.Criptografia.Descripta(objList.Valor("CDU_PASSWORD"),50);
 
                     listClientes.Add(cli);
                     objList.Seguinte();
@@ -379,7 +381,7 @@ namespace FirstREST.Lib_Primavera
                     {
                         cmp = new StdBECampo();
                         cmp.Nome = "CDU_PASSWORD";
-                        cmp.Valor = cli.password;
+                        cmp.Valor = PriEngine.Platform.Criptografia.Encripta(cli.password, 50);
                         cmps.Insere(cmp);
                     }
 

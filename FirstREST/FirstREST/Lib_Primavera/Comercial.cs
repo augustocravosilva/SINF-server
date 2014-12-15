@@ -77,7 +77,7 @@ namespace FirstREST.Lib_Primavera
                     cli.city = objList.Valor("Fac_Local");
                     cli.zip_code1 = objList.Valor("Fac_Cp");
                     cli.zip_code2 = objList.Valor("Fac_Cploc");
-                    cli.password = PriEngine.Platform.Criptografia.Descripta(objList.Valor("CDU_PASSWORD"),50);
+                    //cli.password = PriEngine.Platform.Criptografia.Descripta(objList.Valor("CDU_PASSWORD"),50);
 
                     listClientes.Add(cli);
                     objList.Seguinte();

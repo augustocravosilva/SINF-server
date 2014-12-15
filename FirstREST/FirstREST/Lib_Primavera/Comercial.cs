@@ -454,6 +454,9 @@ namespace FirstREST.Lib_Primavera
                         sub.size = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao2();
                         sub.id = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
                         sub.stock = (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ACENT", "");
+                        sub.stock_shops = new String[2];
+                        sub.stock_shops[0] = "Porto: " + (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "APORT", "");
+                        sub.stock_shops[1] = "Lisboa: " + (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ALISB", "");
                         subproducts.Add(sub);
                     }
 
@@ -469,7 +472,10 @@ namespace FirstREST.Lib_Primavera
                         string path = pics.Valor("Id");
                         if (tipo.Equals("IPR"))
                             images_path.Insert(0, path);
-                        else images_path.Add(path);
+                        else if (tipo.Equals("IMG"))
+                            images_path.Add(path);
+                        else if (tipo.Equals("NOR") && myArt.specs_link == null) 
+                            myArt.specs_link = path;
                         pics.Seguinte();
                     }
 

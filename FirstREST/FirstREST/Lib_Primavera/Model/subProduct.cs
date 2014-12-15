@@ -14,5 +14,8 @@ namespace FirstREST.Lib_Primavera.Model
         public int stock { get; set; }
 
         public string id { get; set; }
+
+        public string[] stock_shops { get; set; }
+
     }
 }

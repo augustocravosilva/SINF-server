@@ -25,7 +25,7 @@ namespace FirstREST
               name: "PostWithAction",
               routeTemplate: "api/{controller}/{action}",
               defaults: new {action = "post"},
-              constraints: new { httpMethod = new HttpMethodConstraint("POST") }
+              constraints: new { httpMethod = new HttpMethodConstraint("POST","OPTIONS") }
           );
 
             config.Routes.MapHttpRoute(

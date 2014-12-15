@@ -7,11 +7,15 @@ namespace FirstREST.Lib_Primavera.Model
 {
     public class LinhaDocVenda
     {
+         public LinhaDocVenda()
+          {
+              quantity = 0.0;
+          }
           public string product_id { get; set; }
 
           public double unit_price { get; set; }
 
-          public double quatity { get; set; }
+          public double quantity { get; set; }
 
           public double total { get; set; }
 

@@ -453,7 +453,7 @@ namespace FirstREST.Lib_Primavera
                         sub.color = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao1();
                         sub.size = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao2();
                         sub.id = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
-                        sub.stock = (int)PriEngine.Engine.Comercial.Artigos.Consulta(sub.id).get_StkActual();
+                        sub.stock = (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ACENT", "");
                         subproducts.Add(sub);
                     }
 
@@ -721,84 +721,95 @@ namespace FirstREST.Lib_Primavera
             
             GcpBELinhasDocumentoVenda myLinhas = new GcpBELinhasDocumentoVenda();
              
-            PreencheRelacaoVendas rl = new PreencheRelacaoVendas();
-
             DateTime time = DateTime.Now;
 
             try
             {
-                if (start() == true)
-                {
-                    // Atribui valores ao cabecalho do doc
-                    //myEnc.set_DataDoc(dv.Data);
-                    //myEnc.set_EmModoEdicao(true);
-                    myEnc.set_Entidade(dv.customer);
-                    myEnc.set_DataDoc(time);
-                   // myEnc.set_DataVenc(time);
-                    myEnc.set_Serie("A");
-                    myEnc.set_Tipodoc("ECL");
-                    myEnc.set_TipoEntidade("C");
-                    myEnc.set_Seccao("2");//vendas a retalho
-                   // myEnc.set_Moeda("EUR");
-                   // myEnc.set_Cambio(1.0);
-                   // myEnc.set_CambioMBase(1.0);
-                   // myEnc.set_CambioMAlt(1.0);
-                    myEnc.set_CondPag("1"); // pronto pagamento
-                   // myEnc.set_EntidadeFac(dv.customer);
 
-
-                    foreach (Model.LinhaDocVenda lin in dv.lines)
-                    {
-                       double preco = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(lin.product_id)[1].get_PVP1();
-                        /*GcpBELinhaDocumentoVenda l = new GcpBELinhaDocumentoVenda();
-                        l.set_Artigo(lin.product_id);
-                        l.set_Quantidade(lin.quatity);
-                        l.set_QuantReservada(lin.quatity);
-                        l.set_TipoLinha("10");
-                        l.set_Unidade(PriEngine.Engine.Comercial.Artigos.Consulta(lin.product_id).get_UnidadeBase());
-                        l.set_DataEntrega(time);
-                        myLinhas.Insere(l);*/
-                        
-                       GcpBELinhasDocumentoVenda linhasArt = PriEngine.Engine.Comercial.Vendas.SugereArtigoLinhas(myEnc, lin.product_id, lin.quatity, "ACENT","",preco);
-                       for (int i = 1; i <= linhasArt.NumItens; i++ )
-                       {
-                           GcpBELinhaDocumentoVenda l = linhasArt[i];
-                           if (l.get_TipoLinha().Equals("10"))
-                           {
-                               l.set_DataEntrega(time);
-                               l.set_QuantReservada(lin.quatity);
-                           }
-                           myLinhas.Insere(l);
-                       }
-                    }
-
-                    myEnc.set_Linhas(myLinhas);
-                    myEnc = PriEngine.Engine.Comercial.Vendas.PreencheDadosRelacionados(myEnc, PreencheRelacaoVendas.vdDadosTodos);
-                   // PriEngine.Engine.Comercial.Compras.TransformaDocumento(
-
-
-                    if (dv.delivery_adress != null && dv.delivery_city != null && dv.delivery_zip1 != null && dv.delivery_zip2 != null)
-                    {
-                        myEnc.set_MoradaEntrega(dv.delivery_adress);
-                        myEnc.set_CodPostalEntrega(dv.delivery_zip1);
-                        myEnc.set_CodPostalLocalidadeEntrega(dv.delivery_zip2);
-                        myEnc.set_LocalidadeEntrega(dv.delivery_city);
-                    }
-
-                    PriEngine.Engine.IniciaTransaccao();
-                    PriEngine.Engine.Comercial.Vendas.Actualiza(myEnc);
-                    PriEngine.Engine.TerminaTransaccao();
-                    erro.Erro = 0;
-                    erro.Descricao = myEnc.get_ID();
-                    return erro;
-                }
-                else
+                if (dv.customer == null)
                 {
                     erro.Erro = 1;
-                    erro.Descricao = "Erro ao abrir empresa";
+                    erro.Descricao = "No customer received";
                     return erro;
-
                 }
+
+                for (int i = 0; i < dv.lines.Count; i++)
+                {
+                    if(dv.lines[i].quantity <= 0)
+                    {
+                        erro.Erro = 1;
+                        erro.Descricao = dv.lines[i].product_id + " - quantity error";
+                        return erro;
+                    }
+                    for(int j = i+1; j < dv.lines.Count; j++)
+                        if(dv.lines[i].product_id.Equals(dv.lines[j].product_id))
+                        {
+                            erro.Erro = 1;
+                            erro.Descricao = "repeated product";
+                            return erro;
+                        }
+                }
+
+                    if (start() == true)
+                    {
+                        myEnc.set_Entidade(dv.customer);
+                        myEnc.set_DataDoc(time);
+                        myEnc.set_Serie("A");
+                        myEnc.set_Tipodoc("ECL");
+                        myEnc.set_TipoEntidade("C");
+                        myEnc.set_Seccao("2");//vendas a retalho
+                        myEnc.set_CondPag("1"); // pronto pagamento
+
+                        myEnc = PriEngine.Engine.Comercial.Vendas.PreencheDadosRelacionados(myEnc, PreencheRelacaoVendas.vdDadosTodos);
+
+                        foreach (Model.LinhaDocVenda lin in dv.lines)
+                        {
+                            double preco = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(lin.product_id)[1].get_PVP1();
+                           
+                            if (PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(lin.product_id, "ACENT", "") < lin.quantity)
+                            {
+                                erro.Erro = 1;
+                                erro.Descricao = lin.product_id + " - out of stock";
+                            };
+
+                            GcpBELinhasDocumentoVenda linhasArt = PriEngine.Engine.Comercial.Vendas.SugereArtigoLinhas(myEnc, lin.product_id, lin.quantity, "ACENT", "", preco);
+                            for (int i = 1; i <= linhasArt.NumItens; i++)
+                            {
+                                GcpBELinhaDocumentoVenda l = linhasArt[i];
+                                if (l.get_IdLinhaPai() != null)
+                                {
+                                    l.set_DataEntrega(time);
+                                    l.set_QuantReservada(lin.quantity);
+                                }
+                                String outp = l.Conteudo;
+                                myLinhas.Insere(l);
+                            }
+                        }
+
+                        myEnc.set_Linhas(myLinhas);
+
+                        if (dv.delivery_adress != null && dv.delivery_city != null && dv.delivery_zip1 != null && dv.delivery_zip2 != null)
+                        {
+                            myEnc.set_MoradaEntrega(dv.delivery_adress);
+                            myEnc.set_CodPostalEntrega(dv.delivery_zip1);
+                            myEnc.set_CodPostalLocalidadeEntrega(dv.delivery_zip2);
+                            myEnc.set_LocalidadeEntrega(dv.delivery_city);
+                        }
+
+                        PriEngine.Engine.IniciaTransaccao();
+                        PriEngine.Engine.Comercial.Vendas.Actualiza(myEnc);
+                        PriEngine.Engine.TerminaTransaccao();
+                        erro.Erro = 0;
+                        erro.Descricao = myEnc.get_ID();
+                        return erro;
+                    }
+                    else
+                    {
+                        erro.Erro = 1;
+                        erro.Descricao = "Erro ao abrir empresa";
+                        return erro;
+
+                    }
 
             }
             catch (Exception ex)
@@ -880,7 +891,7 @@ namespace FirstREST.Lib_Primavera
                         l.color = PriEngine.Engine.Comercial.Artigos.EditaDimensao(artigo).get_RubricaDimensao1();
                         l.size = PriEngine.Engine.Comercial.Artigos.EditaDimensao(artigo).get_RubricaDimensao2();
                         l.unit_price = linha.get_PrecUnit();
-                        l.quatity = linha.get_Quantidade();
+                        l.quantity = linha.get_Quantidade();
                         l.total = linha.get_TotalIliquido() + linha.get_TotalIva();
                         listlindv.Add(l);
                     }

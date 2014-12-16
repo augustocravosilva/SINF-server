@@ -522,6 +522,44 @@ namespace FirstREST.Lib_Primavera
             }
 
         }
+
+        struct artVendas
+        {
+            string art;
+            int vendas;
+        }
+
+        public static List<Model.Artigo> ListaArtigosMaisVendidos(string quantidade)
+        {
+            StdBELista objList;
+
+            List<Model.Artigo> listArts = new List<Model.Artigo>();
+
+            if (start() == true)
+            {
+
+                List<artVendas> listcompara = new List<artVendas>();
+
+                objList = PriEngine.Engine.Consulta("SELECT TOP "+ quantidade +" SUM(QtReservada) as qtd, ArtigoPai FROM ArtigoArmazem LEFT JOIN Artigo ON  Artigo.Artigo= ArtigoArmazem.Artigo  where ArtigoPai != '' Group by ArtigoPai ORDER BY qtd desc ");
+
+                while (!objList.NoFim())
+                {
+                    string id = objList.Valor("ArtigoPai");
+                    Model.Artigo art = GetArtigo(id);
+                    if (art != null)
+                        listArts.Add(art);
+                    objList.Seguinte(); 
+                }
+
+                return listArts;
+
+            }
+            else
+            {
+                return null;
+
+            }
+        }
         #endregion
 
 

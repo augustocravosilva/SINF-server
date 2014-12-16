@@ -41,6 +41,14 @@ namespace FirstREST.Controllers
             return answer;
         }
 
+        [HttpGet]
+        public ProductsAnswer hot(string id)
+        {
+            ProductsAnswer answer = new ProductsAnswer();
+            answer.products = Lib_Primavera.Comercial.ListaArtigosMaisVendidos(id);
+            return answer;
+        }
+
         // GET api/artigo/5    
         public ProductAnswer Get(string id)
         {

@@ -414,82 +414,89 @@ namespace FirstREST.Lib_Primavera
 
         #region Artigo
 
-        public static Lib_Primavera.Model.Artigo GetArtigo(string codArtigo)
+        public static Lib_Primavera.Model.Artigo GetArtigo(string codArtigo, int trynum = 0)
         {
-
-            GcpBEArtigo objArtigo = new GcpBEArtigo();
-            Model.Artigo myArt = new Model.Artigo();
-
-            if (start() == true)
+            try
             {
 
-                if (PriEngine.Engine.Comercial.Artigos.Existe(codArtigo) == false)
+                GcpBEArtigo objArtigo = new GcpBEArtigo();
+                Model.Artigo myArt = new Model.Artigo();
+
+                if (start() == true)
                 {
-                    return null;
+
+                    if (PriEngine.Engine.Comercial.Artigos.Existe(ref codArtigo) == false)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        objArtigo = PriEngine.Engine.Comercial.Artigos.Consulta(ref codArtigo);
+                        string pai = objArtigo.get_ArtigoPai();
+                        if (pai.Length > 0)
+                            return null;
+                        myArt.id = objArtigo.get_Artigo();
+                        myArt.name = objArtigo.get_Descricao();
+                        myArt.category = objArtigo.get_SubFamilia();
+                        myArt.brand = objArtigo.get_Marca();
+                        myArt.price = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(codArtigo)[1].get_PVP1();
+                        foreach (StdBECampo campo in objArtigo.get_CamposUtil())
+                        {
+                            if (campo.Nome.Equals("CDU_MATERIAL"))
+                                myArt.material = campo.Valor;
+                            else myArt.description = campo.Valor;
+                        }
+                        List<Model.SubProduct> subproducts = new List<Model.SubProduct>();
+
+                        int sublength = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo).NumItens;
+                        for (int i = 1; i <= sublength; i++)
+                        {
+                            Model.SubProduct sub = new Model.SubProduct();
+                            sub.color = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao1();
+                            sub.size = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao2();
+                            sub.id = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
+                            sub.stock = (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ACENT", "");
+                            sub.stock_shops = new String[2];
+                            sub.stock_shops[0] = "Porto: " + (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "APORT", "");
+                            sub.stock_shops[1] = "Lisboa: " + (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ALISB", "");
+                            subproducts.Add(sub);
+                        }
+
+                        myArt.subproducts = subproducts.ToArray();
+
+                        StdBELista pics = PriEngine.Engine.Consulta("Select * from Anexos where Tabela=4 and Chave='" + codArtigo + "'");
+
+                        List<string> images_path = new List<string>();
+
+                        while (!pics.NoFim())
+                        {
+                            string tipo = pics.Valor("Tipo");
+                            string path = pics.Valor("Id");
+                            if (tipo.Equals("IPR"))
+                                images_path.Insert(0, path);
+                            else if (tipo.Equals("IMG"))
+                                images_path.Add(path);
+                            else if (tipo.Equals("NOR") && myArt.specs_link == null)
+                                myArt.specs_link = path;
+                            pics.Seguinte();
+                        }
+
+                        myArt.image_links = images_path.ToArray();
+
+                        return myArt;
+                    }
+
                 }
                 else
                 {
-                    objArtigo = PriEngine.Engine.Comercial.Artigos.Consulta(codArtigo);
-                    string pai = objArtigo.get_ArtigoPai();
-                    if (pai.Length>0)
-                        return null;
-                    myArt.id = objArtigo.get_Artigo();
-                    myArt.name = objArtigo.get_Descricao();
-                    myArt.category = objArtigo.get_SubFamilia();
-                    myArt.brand = objArtigo.get_Marca();
-                    myArt.price = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(codArtigo)[1].get_PVP1();
-                    foreach(StdBECampo campo in objArtigo.get_CamposUtil())
-                    {
-                        if (campo.Nome.Equals("CDU_MATERIAL"))
-                            myArt.material = campo.Valor;
-                        else myArt.description = campo.Valor;
-                    }
-                    List<Model.SubProduct> subproducts = new List<Model.SubProduct>();
-
-                    int sublength = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo).NumItens;
-                    for (int i = 1; i <= sublength; i++)
-                    {
-                        Model.SubProduct sub = new Model.SubProduct();
-                        sub.color = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao1();
-                        sub.size = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_RubricaDimensao2();
-                        sub.id = PriEngine.Engine.Comercial.Artigos.EditaDimensoes(codArtigo)[i].get_Artigo();
-                        sub.stock = (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ACENT", "");
-                        sub.stock_shops = new String[2];
-                        sub.stock_shops[0] = "Porto: " + (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "APORT", "");
-                        sub.stock_shops[1] = "Lisboa: " + (int)PriEngine.Engine.Comercial.ArtigosArmazens.DaStockDisponivelArtigoArmazem(sub.id, "ALISB", "");
-                        subproducts.Add(sub);
-                    }
-
-                    myArt.subproducts = subproducts.ToArray();
-
-                    StdBELista pics = PriEngine.Engine.Consulta("Select * from Anexos where Tabela=4 and Chave='" + codArtigo + "'");
-
-                    List<string> images_path = new List<string>();
-
-                    while (!pics.NoFim())
-                    {
-                        string tipo = pics.Valor("Tipo");
-                        string path = pics.Valor("Id");
-                        if (tipo.Equals("IPR"))
-                            images_path.Insert(0, path);
-                        else if (tipo.Equals("IMG"))
-                            images_path.Add(path);
-                        else if (tipo.Equals("NOR") && myArt.specs_link == null) 
-                            myArt.specs_link = path;
-                        pics.Seguinte();
-                    }
-
-                    myArt.image_links = images_path.ToArray();
-                    
-                        return myArt;
+                    return null;
                 }
-                
-            }
-            else
+            } catch (Exception e)
             {
-                return null;
+                if (trynum>3)
+                    return null;
+                else return GetArtigo(codArtigo,++trynum);
             }
-
         }
 
         public static List<Model.Artigo> ListaArtigos(string category = null)
@@ -500,14 +507,17 @@ namespace FirstREST.Lib_Primavera
 
             if (start() == true)
             {
-
-                objList = PriEngine.Engine.Comercial.Artigos.LstArtigos();
+                string query;
+                if(category == null)
+                   query = "select Artigo from Artigo where ArtigoPai IS NULL";
+                else query = "select Artigo from Artigo where ArtigoPai IS NULL and SubFamilia = '" + category + "'";
+                objList = PriEngine.Engine.Consulta(query);
 
                 while (!objList.NoFim())
                 {
-                    string id = objList.Valor("artigo");
+                    string id = objList.Valor("Artigo");
                     Model.Artigo art = GetArtigo(id);
-                    if(art!=null && ( art.category.Equals(category) || category == null))
+                    if(art!=null)
                         listArts.Add(art);
                     objList.Seguinte();
                 }
@@ -562,7 +572,7 @@ namespace FirstREST.Lib_Primavera
             if (start() == true)
             {
 
-                objList = PriEngine.Engine.Consulta("SELECT TOP " + quantidade + " SUM(StkActual - QtReservada) as qtd, ArtigoPai FROM ArtigoArmazem LEFT JOIN Artigo ON  Artigo.Artigo= ArtigoArmazem.Artigo  where ArtigoPai != '' Group by ArtigoPai ORDER BY qtd desc ");
+                objList = PriEngine.Engine.Consulta("SELECT TOP " + quantidade + " SUM(ArtigoArmazem.StkActual - QtReservada) as qtd, ArtigoPai FROM ArtigoArmazem LEFT JOIN Artigo ON  Artigo.Artigo= ArtigoArmazem.Artigo  where ArtigoPai != '' Group by ArtigoPai ORDER BY qtd desc ");
 
                 while (!objList.NoFim())
                 {

@@ -295,7 +295,7 @@ namespace FirstREST.Lib_Primavera
                     }
                     return true;
                 }
-                return false;
+                return true;
             }
             return false;
         }
@@ -389,7 +389,7 @@ namespace FirstREST.Lib_Primavera
                     PriEngine.Engine.Comercial.Clientes.Actualiza(myCli);
 
                     erro.Erro = 0;
-                    erro.Descricao = "Sucesso";
+                    erro.Descricao = new_id;
                     return erro;
                 }
                 else

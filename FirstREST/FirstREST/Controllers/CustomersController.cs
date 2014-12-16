@@ -59,7 +59,7 @@ namespace FirstREST.Controllers
             if (erro.Erro == 0)
             {
                 var response = Request.CreateResponse(
-                   HttpStatusCode.Created);
+                   HttpStatusCode.Created, erro.Descricao);
                 return response;
             }
 

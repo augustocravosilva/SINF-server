@@ -76,7 +76,7 @@ namespace FirstREST.Lib_Primavera.Model
 
 
 
-        public string delivery_adress { get; set; }
+        public string delivery_address { get; set; }
 
         public string delivery_city { get; set; }
 

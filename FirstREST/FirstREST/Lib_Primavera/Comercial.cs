@@ -787,10 +787,13 @@ namespace FirstREST.Lib_Primavera
 
         // ------ Documentos de venda ----------------------
 
+
         #region venda
         
         public static Model.RespostaErro Encomendas_New(Model.DocVenda dv)
         {
+            bool iniciouTrans = false;
+
             Lib_Primavera.Model.RespostaErro erro = new Model.RespostaErro();
 
             GcpBEDocumentoVenda myEnc = new GcpBEDocumentoVenda();
@@ -864,14 +867,15 @@ namespace FirstREST.Lib_Primavera
 
                         myEnc.set_Linhas(myLinhas);
 
-                        if (dv.delivery_adress != null && dv.delivery_city != null && dv.delivery_zip1 != null && dv.delivery_zip2 != null)
+                        if (dv.delivery_address != null && dv.delivery_city != null && dv.delivery_zip1 != null && dv.delivery_zip2 != null)
                         {
-                            myEnc.set_MoradaEntrega(dv.delivery_adress);
+                            myEnc.set_MoradaEntrega(dv.delivery_address);
                             myEnc.set_CodPostalEntrega(dv.delivery_zip1);
                             myEnc.set_CodPostalLocalidadeEntrega(dv.delivery_zip2);
                             myEnc.set_LocalidadeEntrega(dv.delivery_city);
                         }
 
+                        iniciouTrans = true;
                         PriEngine.Engine.IniciaTransaccao();
                         PriEngine.Engine.Comercial.Vendas.Actualiza(myEnc);
                         PriEngine.Engine.TerminaTransaccao();
@@ -890,7 +894,8 @@ namespace FirstREST.Lib_Primavera
             }
             catch (Exception ex)
             {
-                PriEngine.Engine.DesfazTransaccao();
+                if(iniciouTrans)
+                    PriEngine.Engine.DesfazTransaccao();
                 erro.Erro = 1;
                 erro.Descricao = ex.Message;
                 return erro;
@@ -915,7 +920,11 @@ namespace FirstREST.Lib_Primavera
                     GcpBEDocumentoVenda venda = PriEngine.Engine.Comercial.Vendas.EditaID(dv.id);
                     dv.date = venda.get_DataDoc();
                     dv.total = venda.get_TotalDocumento();
-                    dv.state = venda.get_Estado();
+                    if (venda.get_Anulado())
+                        dv.state = "A";
+                    else if (venda.get_Fechado())
+                        dv.state = "F";
+                    else dv.state = venda.get_Estado();
                     listdv.Add(dv);
                     objListCab.Seguinte();
                 }
@@ -940,10 +949,14 @@ namespace FirstREST.Lib_Primavera
                 dv.id = id;
                 dv.customer = venda.get_Entidade();
                 dv.date = venda.get_DataDoc();
-                dv.state = venda.get_Estado();
+                if (venda.get_Anulado())
+                    dv.state = "A";
+                else if (venda.get_Fechado())
+                    dv.state = "F";
+                else dv.state = venda.get_Estado();
                 dv.total = venda.get_TotalDocumento();
                 GcpBECargaDescarga cd = venda.get_CargaDescarga();
-                dv.delivery_adress = cd.MoradaEntrega;
+                dv.delivery_address = cd.MoradaEntrega;
                 dv.delivery_city = cd.LocalidadeEntrega;
                 dv.delivery_zip1 = cd.CodPostalEntrega;
                 dv.delivery_zip2 = cd.CodPostalLocalidadeEntrega;

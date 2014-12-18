@@ -838,9 +838,13 @@ namespace FirstREST.Lib_Primavera
                         myEnc.set_TipoEntidade("C");
                         myEnc.set_Seccao("2");//vendas a retalho
                         myEnc.set_CondPag("1"); // pronto pagamento
+<<<<<<< HEAD
 
                         myEnc = PriEngine.Engine.Comercial.Vendas.PreencheDadosRelacionados(myEnc, PreencheRelacaoVendas.vdDadosTodos);
 
+=======
+                        
+>>>>>>> parent of c93e9fc... .
                         foreach (Model.LinhaDocVenda lin in dv.lines)
                         {
                             double preco = PriEngine.Engine.Comercial.ArtigosPrecos.ListaArtigosMoedas(lin.product_id)[1].get_PVP1();
@@ -864,6 +868,11 @@ namespace FirstREST.Lib_Primavera
                                 myLinhas.Insere(l);
                             }
                         }
+<<<<<<< HEAD
+=======
+                        //apos verificar produtos para nao perder tempo aqui se houver falta de stock
+                        myEnc = PriEngine.Engine.Comercial.Vendas.PreencheDadosRelacionados(myEnc, PreencheRelacaoVendas.vdDadosTodos);
+>>>>>>> parent of c93e9fc... .
 
                         myEnc.set_Linhas(myLinhas);
 
